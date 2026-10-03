@@ -1,0 +1,52 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.feedbackBox {
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  background: var(--km-fill);
+  border-radius: var(--radius-sm);
+  color: var(--km-oxford);
+  text-align: center;
+  font-weight: 500;
+}
+
+.offlineNotice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--status-cancelled);
+  font-weight: 500;
+}
+
+.doneContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--status-finished-bg);
+  border: 1px solid #D1E7DD;
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.doneText {
+  color: var(--status-finished);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.notReadyText {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--km-gray);
+  padding: 8px;
+  background: var(--km-fill);
+  border-radius: var(--radius-sm);
+}

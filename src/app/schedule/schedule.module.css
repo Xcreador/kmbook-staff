@@ -1,0 +1,200 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.introHeader {
+  display: flex;
+  flex-direction: column;
+}
+
+.introRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.82rem;
+  color: var(--km-gray);
+  margin-top: 2px;
+}
+
+.totalBadge {
+  background: var(--km-oxford);
+  color: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.totalNum {
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.totalLabel {
+  font-size: 0.62rem;
+  color: #CCCCCC;
+}
+
+.daysList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dayCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dayOff {
+  opacity: 0.75;
+  background: var(--km-niebla);
+  border-style: dashed;
+}
+
+.dayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dayName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.dayStatus {
+  font-size: 0.75rem;
+  color: var(--km-gray);
+}
+
+.shiftsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shiftItem {
+  background: var(--km-niebla);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shiftMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shiftTime {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timeSpan {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  font-variant-numeric: tabular-nums;
+}
+
+.shiftLocation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: var(--km-gray);
+}
+
+.breaksList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px dashed var(--color-border);
+  padding-top: 6px;
+}
+
+.breakItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--km-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.offPlaceholder {
+  font-size: 0.8rem;
+  color: var(--km-gray);
+  font-style: italic;
+}
+
+.absencesSection {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.absencesHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.absencesTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.absencesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.absenceCard {
+  background: #FFFDFE;
+  border: 1px solid #F8D7DA;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.absenceDates {
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.absenceReason {
+  color: var(--km-gray);
+}

@@ -1,0 +1,263 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.headerCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dateLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--km-gray);
+  text-transform: capitalize;
+}
+
+.timeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.timeMain {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  font-variant-numeric: tabular-nums;
+}
+
+.locationTag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--km-gray);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: 8px;
+}
+
+.cardTitle {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--km-oxford);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.clientRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.clientAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--km-fill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clientDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.clientName {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.phoneLink {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.84rem;
+  color: var(--km-pink);
+  font-weight: 500;
+}
+
+.noticeBox {
+  background: #FFFBEB;
+  border-left: 3px solid #D97706;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.noticeHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.noticeTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #B45309;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.noticeContent {
+  font-size: 0.86rem;
+  color: #78350F;
+  line-height: 1.4;
+}
+
+.notesBox {
+  background: var(--km-niebla);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notesTitle {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--km-gray);
+}
+
+.notesText {
+  font-size: 0.84rem;
+  color: var(--km-oxford);
+}
+
+.servicesList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.serviceItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--km-niebla);
+  border-radius: var(--radius-md);
+}
+
+.serviceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.serviceMain {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.serviceName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.serviceDuration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--km-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.profName {
+  font-size: 0.78rem;
+  color: var(--km-gray);
+}
+
+.actionSection {
+  margin-top: 4px;
+}
+
+.operationalNotes {
+  font-size: 0.8rem;
+  color: var(--km-gray);
+  border-top: 1px dashed var(--color-border);
+  padding-top: 10px;
+}
+
+.opLabel {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.opText {
+  display: inline;
+}
+
+.rebookSection {
+  margin-top: 4px;
+}
+
+.rebookCard {
+  background: #FFFDFE;
+  border: 1px dashed var(--km-pink);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rebookTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rebookTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.rebookSubtitle {
+  font-size: 0.8rem;
+  color: var(--km-gray);
+  line-height: 1.4;
+}
