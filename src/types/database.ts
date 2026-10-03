@@ -745,6 +745,10 @@ export type Database = {
         Args: { p_organization_id: string };
         Returns: boolean;
       };
+      get_staff_organization_settings: {
+        Args: { p_organization_id: string };
+        Returns: { staff_individual_time_clock_enabled: boolean };
+      };
     };
   };
 };
