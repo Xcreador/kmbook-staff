@@ -95,6 +95,30 @@
   text-transform: uppercase;
 }
 
+.settingBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settingTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settingTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.settingDesc {
+  font-size: 0.8rem;
+  color: var(--km-gray);
+  line-height: 1.45;
+}
+
 .orgRow {
   display: flex;
   justify-content: space-between;

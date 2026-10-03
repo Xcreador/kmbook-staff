@@ -17,6 +17,14 @@ export default async function TimeClockPage() {
   }
 
   const org = viewer.activeOrganization;
+
+  // Gobernanza: Si el fichaje individual está desactivado, redirigir a Mi jornada
+  const { getOrganizationSettings } = await import("@/lib/kmbook/organization-settings");
+  const settings = await getOrganizationSettings(org.id);
+  if (!settings.staffIndividualTimeClockEnabled) {
+    redirect("/today");
+  }
+
   const supabase = await createClient();
 
   const [unreadCount, initialShift, initialHistory, locations] = await Promise.all([

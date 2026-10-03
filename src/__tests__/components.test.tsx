@@ -4,6 +4,8 @@ import { render, screen } from "@testing-library/react";
 import { StatusPill } from "@/components/StatusPill";
 import { Button } from "@/components/Button";
 import { BottomNav } from "@/components/BottomNav";
+import { CurrentServiceCard } from "@/components/CurrentServiceCard";
+import type { StaffVisit } from "@/lib/kmbook/today";
 
 describe("KMBOOK Staff — Component System Tests", () => {
   it("renders StatusPill for each Core status with accessible labels", () => {
@@ -32,15 +34,96 @@ describe("KMBOOK Staff — Component System Tests", () => {
     expect(btn.hasAttribute("disabled")).toBe(true);
   });
 
-  it("renders BottomNav with 4 primary tabs and unread badge", () => {
-    render(<BottomNav unreadCount={3} />);
+  it("renders BottomNav with 4 primary tabs when time-clock is disabled (default)", () => {
+    render(<BottomNav unreadCount={3} timeClockEnabled={false} />);
 
-    expect(screen.getByText("HOY")).toBeDefined();
+    expect(screen.getByText("MI JORNADA")).toBeDefined();
     expect(screen.getByText("AGENDA")).toBeDefined();
-    expect(screen.getByText("FICHAJE")).toBeDefined();
     expect(screen.getByText("AVISOS")).toBeDefined();
+    expect(screen.getByText("PERFIL")).toBeDefined();
+    expect(screen.queryByText("FICHAJE")).toBeNull();
 
     // Check badge display
     expect(screen.getByText("3")).toBeDefined();
+  });
+
+  it("renders BottomNav with FICHAJE when time-clock is enabled by organization", () => {
+    render(<BottomNav unreadCount={0} timeClockEnabled={true} />);
+
+    expect(screen.getByText("MI JORNADA")).toBeDefined();
+    expect(screen.getByText("AGENDA")).toBeDefined();
+    expect(screen.getByText("FICHAJE")).toBeDefined();
+    expect(screen.getByText("AVISOS")).toBeDefined();
+    expect(screen.queryByText("PERFIL")).toBeNull();
+  });
+
+  it("renders CurrentServiceCard for arrived client with INICIAR SERVICIO button", () => {
+    const mockVisit: StaffVisit = {
+      appointmentId: "appt-current-1",
+      startsAt: "2026-10-03T17:30:00Z",
+      endsAt: "2026-10-03T18:15:00Z",
+      clientName: "María López",
+      teamNotes: "Uñas sensibles",
+      status: "arrived",
+      serviceSummary: "Manicura rusa + refuerzo",
+      totalDurationMinutes: 45,
+      isRunning: false,
+      isFinished: false,
+      isPending: false,
+      items: [
+        {
+          itemId: "item-1",
+          serviceName: "Manicura rusa + refuerzo",
+          durationMinutes: 45,
+          actualStartedAt: null,
+          actualFinishedAt: null,
+          actualDurationSeconds: null,
+          isExecutable: true,
+          isRunning: false,
+          isDone: false,
+        },
+      ],
+    };
+
+    render(<CurrentServiceCard visit={mockVisit} organizationId="org-123" />);
+
+    expect(screen.getByText("María López")).toBeDefined();
+    expect(screen.getByText("Manicura rusa + refuerzo")).toBeDefined();
+    expect(screen.getByRole("button", { name: /INICIAR SERVICIO/i })).toBeDefined();
+  });
+
+  it("renders CurrentServiceCard for active in-service appointment with FINALIZAR button", () => {
+    const mockVisit: StaffVisit = {
+      appointmentId: "appt-active-2",
+      startsAt: "2026-10-03T17:30:00Z",
+      endsAt: "2026-10-03T18:15:00Z",
+      clientName: "Elena Ramos",
+      teamNotes: null,
+      status: "in_service",
+      serviceSummary: "Tratamiento hidratante",
+      totalDurationMinutes: 45,
+      isRunning: true,
+      isFinished: false,
+      isPending: false,
+      items: [
+        {
+          itemId: "item-2",
+          serviceName: "Tratamiento hidratante",
+          durationMinutes: 45,
+          actualStartedAt: "2026-10-03T17:35:00Z",
+          actualFinishedAt: null,
+          actualDurationSeconds: null,
+          isExecutable: false,
+          isRunning: true,
+          isDone: false,
+        },
+      ],
+    };
+
+    render(<CurrentServiceCard visit={mockVisit} organizationId="org-123" />);
+
+    expect(screen.getByText("Elena Ramos")).toBeDefined();
+    expect(screen.getByRole("button", { name: /FINALIZAR SERVICIO/i })).toBeDefined();
+    expect(screen.getByText(/EN SERVICIO/i)).toBeDefined();
   });
 });

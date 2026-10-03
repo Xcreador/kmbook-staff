@@ -17,6 +17,7 @@ interface AppShellProps {
   showBack?: boolean;
   backHref?: string;
   hideNav?: boolean;
+  timeClockEnabled?: boolean;
 }
 
 export function AppShell({
@@ -29,6 +30,7 @@ export function AppShell({
   showBack,
   backHref,
   hideNav = false,
+  timeClockEnabled = false,
 }: AppShellProps) {
   useEffect(() => {
     registerServiceWorker();
@@ -48,7 +50,7 @@ export function AppShell({
       <main className={`${styles.main} ${hideNav ? styles.noNav : ""}`}>
         <div className={styles.container}>{children}</div>
       </main>
-      {!hideNav && <BottomNav unreadCount={unreadCount} />}
+      {!hideNav && <BottomNav unreadCount={unreadCount} timeClockEnabled={timeClockEnabled} />}
     </div>
   );
 }

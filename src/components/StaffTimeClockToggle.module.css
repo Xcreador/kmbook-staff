@@ -1,0 +1,69 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.statusText {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--km-oxford);
+}
+
+.switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  background-color: var(--color-border);
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.switch:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.switchOn {
+  background-color: var(--km-pink);
+}
+
+.switchOff {
+  background-color: var(--km-gray);
+}
+
+.slider {
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.switchOn .slider {
+  transform: translateX(20px);
+}
+
+.switchOff .slider {
+  transform: translateX(0);
+}
+
+.feedback {
+  font-size: 0.75rem;
+  color: var(--km-pink);
+  font-weight: 500;
+}

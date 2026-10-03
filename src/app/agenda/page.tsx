@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getAgendaContext } from "@/lib/kmbook/agenda";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
+import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import { StatusPill } from "@/components/StatusPill";
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, CalendarIcon } from "@/components/Icons";
@@ -29,14 +30,16 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
   const selectedDate = rawDate || todayStr;
   const viewMode = rawView === "week" ? "week" : "day";
 
-  const agenda = await getAgendaContext(
-    org.id,
-    selectedDate,
-    viewMode,
-    viewer.professionalRecord?.id,
-  );
-
-  const unreadCount = await getUnreadNotificationCount(org.id);
+  const [agenda, unreadCount, settings] = await Promise.all([
+    getAgendaContext(
+      org.id,
+      selectedDate,
+      viewMode,
+      viewer.professionalRecord?.id,
+    ),
+    getUnreadNotificationCount(org.id),
+    getOrganizationSettings(org.id),
+  ]);
 
   // Calcular fechas anterior y siguiente
   const curr = new Date(selectedDate);
@@ -70,6 +73,7 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
       userName={viewer.profile?.displayName}
       avatarUrl={viewer.profile?.avatarUrl}
       unreadCount={unreadCount}
+      timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.container}>
         {/* Barra de navegación de fecha y selector Día/Semana */}

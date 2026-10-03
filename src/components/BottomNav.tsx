@@ -3,24 +3,27 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SparklesIcon, CalendarIcon, ClockIcon, BellIcon } from "./Icons";
+import { SparklesIcon, CalendarIcon, ClockIcon, BellIcon, UserIcon } from "./Icons";
 import styles from "./BottomNav.module.css";
 
 interface BottomNavProps {
   unreadCount?: number;
+  timeClockEnabled?: boolean;
 }
 
-export function BottomNav({ unreadCount = 0 }: BottomNavProps) {
+export function BottomNav({ unreadCount = 0, timeClockEnabled = false }: BottomNavProps) {
   const pathname = usePathname();
 
   const isToday = pathname === "/today" || pathname === "/";
   const isAgenda = pathname.startsWith("/agenda");
   const isTimeClock = pathname.startsWith("/time-clock");
   const isNotifications = pathname.startsWith("/notifications");
+  const isProfile = pathname.startsWith("/profile");
 
   return (
     <nav className={styles.bottomNav} aria-label="Navegación principal">
       <div className={styles.navContainer}>
+        {/* MI JORNADA */}
         <Link
           href="/today"
           className={`${styles.navItem} ${isToday ? styles.active : ""}`}
@@ -29,9 +32,10 @@ export function BottomNav({ unreadCount = 0 }: BottomNavProps) {
           <div className={styles.iconWrapper}>
             <SparklesIcon size={22} color={isToday ? "var(--km-pink)" : "var(--km-oxford)"} />
           </div>
-          <span className={styles.label}>HOY</span>
+          <span className={styles.label}>MI JORNADA</span>
         </Link>
 
+        {/* AGENDA */}
         <Link
           href="/agenda"
           className={`${styles.navItem} ${isAgenda ? styles.active : ""}`}
@@ -43,17 +47,21 @@ export function BottomNav({ unreadCount = 0 }: BottomNavProps) {
           <span className={styles.label}>AGENDA</span>
         </Link>
 
-        <Link
-          href="/time-clock"
-          className={`${styles.navItem} ${isTimeClock ? styles.active : ""}`}
-          aria-current={isTimeClock ? "page" : undefined}
-        >
-          <div className={styles.iconWrapper}>
-            <ClockIcon size={22} color={isTimeClock ? "var(--km-pink)" : "var(--km-oxford)"} />
-          </div>
-          <span className={styles.label}>FICHAJE</span>
-        </Link>
+        {/* Si fichaje individual está activo: FICHAJE; si no: AVISOS */}
+        {timeClockEnabled && (
+          <Link
+            href="/time-clock"
+            className={`${styles.navItem} ${isTimeClock ? styles.active : ""}`}
+            aria-current={isTimeClock ? "page" : undefined}
+          >
+            <div className={styles.iconWrapper}>
+              <ClockIcon size={22} color={isTimeClock ? "var(--km-pink)" : "var(--km-oxford)"} />
+            </div>
+            <span className={styles.label}>FICHAJE</span>
+          </Link>
+        )}
 
+        {/* AVISOS */}
         <Link
           href="/notifications"
           className={`${styles.navItem} ${isNotifications ? styles.active : ""}`}
@@ -69,6 +77,20 @@ export function BottomNav({ unreadCount = 0 }: BottomNavProps) {
           </div>
           <span className={styles.label}>AVISOS</span>
         </Link>
+
+        {/* Si fichaje individual está OFF: PERFIL en BottomNav */}
+        {!timeClockEnabled && (
+          <Link
+            href="/profile"
+            className={`${styles.navItem} ${isProfile ? styles.active : ""}`}
+            aria-current={isProfile ? "page" : undefined}
+          >
+            <div className={styles.iconWrapper}>
+              <UserIcon size={22} color={isProfile ? "var(--km-pink)" : "var(--km-oxford)"} />
+            </div>
+            <span className={styles.label}>PERFIL</span>
+          </Link>
+        )}
       </div>
     </nav>
   );

@@ -48,6 +48,16 @@ export async function clockAction(params: {
     return { success: false, message: "Acción de fichaje no válida." };
   }
 
+  // Feature Flag: El fichaje individual debe estar habilitado por la organización
+  const { getOrganizationSettings } = await import("@/lib/kmbook/organization-settings");
+  const settings = await getOrganizationSettings(params.organizationId);
+  if (!settings.staffIndividualTimeClockEnabled) {
+    return {
+      success: false,
+      message: "El fichaje individual desde Staff está desactivado por la empresa. Utiliza el Kiosk de recepción.",
+    };
+  }
+
   try {
     const supabase = await createClient();
     const { error } = await supabase.rpc("studio_attendance_clock", {

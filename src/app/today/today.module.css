@@ -97,3 +97,13 @@
   font-size: 0.75rem;
   color: var(--km-gray);
 }
+
+.emptyCard {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  color: var(--km-gray);
+  font-size: 0.88rem;
+}

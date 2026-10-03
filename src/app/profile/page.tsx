@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getStaffViewerContext, clearActiveOrganization, logout } from "@/lib/kmbook/auth";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
+import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
+import { StaffTimeClockToggle } from "@/components/StaffTimeClockToggle";
 import {
   UserIcon,
   BuildingIcon,
@@ -23,6 +25,9 @@ export default async function ProfilePage() {
 
   const org = viewer.activeOrganization;
   const unreadCount = org ? await getUnreadNotificationCount(org.id) : 0;
+  const settings = org
+    ? await getOrganizationSettings(org.id)
+    : { staffIndividualTimeClockEnabled: false };
 
   const handleSwitchOrg = async () => {
     "use server";
@@ -53,6 +58,7 @@ export default async function ProfilePage() {
       userName={viewer.profile?.displayName}
       avatarUrl={viewer.profile?.avatarUrl}
       unreadCount={unreadCount}
+      timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.container}>
         {/* Cabecera del usuario */}
@@ -127,6 +133,27 @@ export default async function ProfilePage() {
             <span className={styles.actionArrow}>→</span>
           </Link>
         </section>
+
+        {/* Configuración de Gestión: Fichaje individual gobernado por la empresa */}
+        {org && (org.role === "owner" || org.role === "manager") && (
+          <section className={styles.card}>
+            <div className={styles.cardHeader}>
+              <h3 className={styles.cardTitle}>CONFIGURACIÓN DE GESTIÓN</h3>
+            </div>
+            <div className={styles.settingBox}>
+              <div className={styles.settingTexts}>
+                <span className={styles.settingTitle}>Permitir fichaje individual desde Staff</span>
+                <span className={styles.settingDesc}>
+                  Permite que el personal registre entrada, descanso y salida desde su propia aplicación Staff. Si está desactivado, el fichaje se realiza desde el Kiosk o tablet de recepción.
+                </span>
+              </div>
+              <StaffTimeClockToggle
+                organizationId={org.id}
+                initialEnabled={settings.staffIndividualTimeClockEnabled}
+              />
+            </div>
+          </section>
+        )}
 
         {/* Acceso opcional a KMBOOK Studio / TPV para recepción/owners (Regla 35) */}
         {(org?.role === "reception" || org?.role === "manager" || org?.role === "owner") && (

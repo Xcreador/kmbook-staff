@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getStaffScheduleContext } from "@/lib/kmbook/schedule";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
+import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import { ClockIcon, MapPinIcon, CalendarIcon, CoffeeIcon } from "@/components/Icons";
 import styles from "./schedule.module.css";
@@ -17,7 +18,10 @@ export default async function SchedulePage() {
   }
 
   const org = viewer.activeOrganization;
-  const unreadCount = await getUnreadNotificationCount(org.id);
+  const [unreadCount, settings] = await Promise.all([
+    getUnreadNotificationCount(org.id),
+    getOrganizationSettings(org.id),
+  ]);
 
   const schedule = viewer.professionalRecord?.id
     ? await getStaffScheduleContext(org.id, viewer.professionalRecord.id)
@@ -32,6 +36,7 @@ export default async function SchedulePage() {
       userName={viewer.profile?.displayName}
       avatarUrl={viewer.profile?.avatarUrl}
       unreadCount={unreadCount}
+      timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.container}>
         <div className={styles.introHeader}>

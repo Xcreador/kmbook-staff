@@ -2,11 +2,13 @@ import { redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getTodayContext } from "@/lib/kmbook/today";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
+import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { StaffTimeClockAdapter } from "@/lib/kmbook/time-clock";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
-import { TimeClockCard } from "@/components/TimeClockCard";
+import { CurrentServiceCard } from "@/components/CurrentServiceCard";
 import { AppointmentCard } from "@/components/AppointmentCard";
+import { TimeClockCard } from "@/components/TimeClockCard";
 import { Timeline } from "@/components/Timeline";
 import { SparklesIcon } from "@/components/Icons";
 import styles from "./today.module.css";
@@ -22,17 +24,42 @@ export default async function TodayPage() {
   }
 
   const org = viewer.activeOrganization;
+  const settings = await getOrganizationSettings(org.id);
   const supabase = await createClient();
 
   const [todayData, unreadCount, initialShift, locations] = await Promise.all([
     getTodayContext(org.id),
     getUnreadNotificationCount(org.id),
-    StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase),
-    StaffTimeClockAdapter.getActiveLocations(org.id, supabase),
+    settings.staffIndividualTimeClockEnabled
+      ? StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase)
+      : Promise.resolve(null),
+    settings.staffIndividualTimeClockEnabled
+      ? StaffTimeClockAdapter.getActiveLocations(org.id, supabase)
+      : Promise.resolve([]),
   ]);
 
   const defaultLocationId = locations.length > 0 ? locations[0].id : null;
   const professionalName = viewer.profile?.displayName || "Profesional";
+
+  // Identificar citas según la jerarquía visual: AHORA -> DESPUÉS -> RESTO DEL DÍA
+  const activeNowVisit =
+    todayData.currentRunningVisit ||
+    todayData.visits.find((v) => v.status === "arrived") ||
+    todayData.nextVisit;
+
+  const followingVisit = activeNowVisit
+    ? todayData.visits.find(
+        (v) =>
+          v.appointmentId !== activeNowVisit.appointmentId &&
+          v.status !== "finished" &&
+          v.status !== "cancelled" &&
+          v.status !== "no_show",
+      ) ?? null
+    : null;
+
+  const remainingVisits = activeNowVisit
+    ? todayData.visits.filter((v) => v.appointmentId !== activeNowVisit.appointmentId)
+    : todayData.visits;
 
   return (
     <AppShell
@@ -40,6 +67,7 @@ export default async function TodayPage() {
       userName={professionalName}
       avatarUrl={viewer.profile?.avatarUrl}
       unreadCount={unreadCount}
+      timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.todayContainer}>
         {/* Encabezado Personal: Saludo y Fecha */}
@@ -72,45 +100,68 @@ export default async function TodayPage() {
           </div>
         </section>
 
-        {/* Sección 1: JORNADA (Fichaje en tiempo real) */}
-        <section className={styles.section} aria-label="Control de jornada">
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>MI JORNADA</h2>
-          </div>
-          <TimeClockCard
-            organizationId={org.id}
-            userId={viewer.user.id}
-            locationId={defaultLocationId}
-            initialShift={initialShift}
-          />
-        </section>
-
-        {/* Sección 2: PRÓXIMA CITA (Prioridad visual destacada) */}
-        {todayData.nextVisit && (
-          <section className={styles.section} aria-label="Próxima cita">
+        {/* Fichaje individual: Solo visible si la empresa lo ha activado */}
+        {settings.staffIndividualTimeClockEnabled && initialShift && (
+          <section className={styles.section} aria-label="Control horario individual">
             <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>
-                {todayData.currentRunningVisit ? "EN SERVICIO AHORA" : "PRÓXIMA CLIENTA"}
-              </h2>
+              <h2 className={styles.sectionTitle}>MI FICHAJE</h2>
             </div>
-            <AppointmentCard visit={todayData.nextVisit} priority={true} />
+            <TimeClockCard
+              organizationId={org.id}
+              userId={viewer.user.id}
+              locationId={defaultLocationId}
+              initialShift={initialShift}
+            />
           </section>
         )}
 
-        {/* Sección 3: MI DÍA (Timeline vertical completo) */}
-        <section className={styles.section} aria-label="Línea temporal del día">
+        {/* Prioridad 1: AHORA (En servicio / Clienta en salón / Próxima) */}
+        <section className={styles.section} aria-label="Cita actual">
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>MI DÍA</h2>
-            <span className={styles.sectionSubtitle}>
-              {todayData.visits.length} {todayData.visits.length === 1 ? "servicio" : "servicios"}
-            </span>
+            <h2 className={styles.sectionTitle}>
+              {todayData.currentRunningVisit
+                ? "AHORA · EN SERVICIO"
+                : activeNowVisit?.status === "arrived"
+                ? "AHORA · CLIENTA EN EL SALÓN"
+                : "AHORA · PRÓXIMA CLIENTA"}
+            </h2>
           </div>
 
-          <Timeline
-            visits={todayData.visits}
-            emptyMessage="No tienes citas agendadas para hoy. Tu jornada está despejada."
-          />
+          {activeNowVisit ? (
+            <CurrentServiceCard visit={activeNowVisit} organizationId={org.id} />
+          ) : (
+            <div className={styles.emptyCard}>
+              <p>No tienes citas pendientes para hoy. Tu jornada está despejada.</p>
+            </div>
+          )}
         </section>
+
+        {/* Prioridad 2: DESPUÉS (Siguiente cita planificada) */}
+        {followingVisit && (
+          <section className={styles.section} aria-label="Siguiente cita">
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>DESPUÉS</h2>
+            </div>
+            <AppointmentCard visit={followingVisit} priority={false} />
+          </section>
+        )}
+
+        {/* Prioridad 3: RESTO DEL DÍA (Línea temporal vertical) */}
+        {remainingVisits.length > 0 && (
+          <section className={styles.section} aria-label="Resto del día">
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>RESTO DEL DÍA</h2>
+              <span className={styles.sectionSubtitle}>
+                {remainingVisits.length} {remainingVisits.length === 1 ? "cita restante" : "citas restantes"}
+              </span>
+            </div>
+
+            <Timeline
+              visits={remainingVisits}
+              emptyMessage="No hay más citas programadas para hoy."
+            />
+          </section>
+        )}
       </div>
     </AppShell>
   );

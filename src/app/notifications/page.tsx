@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getNotificationsContext } from "@/lib/kmbook/notifications";
+import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import { NotificationsView } from "@/components/NotificationsView";
 
@@ -15,7 +16,10 @@ export default async function NotificationsPage() {
   }
 
   const org = viewer.activeOrganization;
-  const context = await getNotificationsContext(org.id);
+  const [context, settings] = await Promise.all([
+    getNotificationsContext(org.id),
+    getOrganizationSettings(org.id),
+  ]);
 
   return (
     <AppShell
@@ -24,6 +28,7 @@ export default async function NotificationsPage() {
       userName={viewer.profile?.displayName}
       avatarUrl={viewer.profile?.avatarUrl}
       unreadCount={context.unreadCount}
+      timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <NotificationsView
         organizationId={org.id}
