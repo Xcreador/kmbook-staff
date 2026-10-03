@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getTodayContext } from "@/lib/kmbook/today";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
+import { StaffTimeClockAdapter } from "@/lib/kmbook/time-clock";
+import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { TimeClockCard } from "@/components/TimeClockCard";
 import { AppointmentCard } from "@/components/AppointmentCard";
@@ -20,9 +22,16 @@ export default async function TodayPage() {
   }
 
   const org = viewer.activeOrganization;
-  const todayData = await getTodayContext(org.id);
-  const unreadCount = await getUnreadNotificationCount(org.id);
+  const supabase = await createClient();
 
+  const [todayData, unreadCount, initialShift, locations] = await Promise.all([
+    getTodayContext(org.id),
+    getUnreadNotificationCount(org.id),
+    StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase),
+    StaffTimeClockAdapter.getActiveLocations(org.id, supabase),
+  ]);
+
+  const defaultLocationId = locations.length > 0 ? locations[0].id : null;
   const professionalName = viewer.profile?.displayName || "Profesional";
 
   return (
@@ -68,7 +77,12 @@ export default async function TodayPage() {
           <div className={styles.sectionHeader}>
             <h2 className={styles.sectionTitle}>MI JORNADA</h2>
           </div>
-          <TimeClockCard organizationId={org.id} userId={viewer.user.id} />
+          <TimeClockCard
+            organizationId={org.id}
+            userId={viewer.user.id}
+            locationId={defaultLocationId}
+            initialShift={initialShift}
+          />
         </section>
 
         {/* Sección 2: PRÓXIMA CITA (Prioridad visual destacada) */}

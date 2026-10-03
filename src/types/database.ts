@@ -14,6 +14,10 @@ export type AppointmentStatus =
 export type AvailabilityBlockKind = "absence" | "block" | "closure";
 export type NotificationChannel = "in_app" | "email" | "whatsapp" | "sms" | "push";
 
+export type AttendanceStatus = "working" | "on_break" | "finished";
+export type AttendanceSource = "self" | "pin_kiosk" | "correction";
+export type AttendanceAction = "start" | "break_start" | "break_end" | "end" | "correct";
+
 export type Database = {
   public: {
     Tables: {
@@ -497,6 +501,59 @@ export type Database = {
         };
         Relationships: [];
       };
+      studio_attendance_sessions: {
+        Row: {
+          id: string;
+          organization_id: string;
+          location_id: string | null;
+          user_id: string;
+          professional_id: string | null;
+          started_at: string;
+          ended_at: string | null;
+          status: AttendanceStatus;
+          source: AttendanceSource;
+          corrected: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      studio_attendance_breaks: {
+        Row: {
+          id: string;
+          organization_id: string;
+          session_id: string;
+          started_at: string;
+          ended_at: string | null;
+          kind: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      studio_attendance_events: {
+        Row: {
+          id: string;
+          organization_id: string;
+          session_id: string | null;
+          user_id: string;
+          actor_id: string | null;
+          action: AttendanceAction;
+          source: AttendanceSource;
+          before_state: Json | null;
+          after_state: Json | null;
+          reason: string | null;
+          idempotency_key: string;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -646,6 +703,47 @@ export type Database = {
       mark_all_notifications_read: {
         Args: { p_organization_id: string };
         Returns: number;
+      };
+      studio_attendance_clock: {
+        Args: {
+          p_organization_id: string;
+          p_location_id: string | null;
+          p_action: AttendanceAction;
+          p_idempotency_key: string;
+        };
+        Returns: Json;
+      };
+      studio_attendance_clock_with_pin: {
+        Args: {
+          p_organization_id: string;
+          p_location_id: string | null;
+          p_user_id: string;
+          p_pin: string;
+          p_action: AttendanceAction;
+          p_idempotency_key: string;
+        };
+        Returns: Json;
+      };
+      studio_attendance_kiosk_roster: {
+        Args: { p_organization_id: string };
+        Returns: { user_id: string; display_name: string; status: AttendanceStatus | "idle" }[];
+      };
+      studio_attendance_correct: {
+        Args: {
+          p_organization_id: string;
+          p_session_id: string | null;
+          p_user_id: string | null;
+          p_started_at: string;
+          p_ended_at: string | null;
+          p_breaks: Json | null;
+          p_reason: string;
+          p_idempotency_key: string;
+        };
+        Returns: Json;
+      };
+      studio_attendance_can_view_team: {
+        Args: { p_organization_id: string };
+        Returns: boolean;
       };
     };
   };

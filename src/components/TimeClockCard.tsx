@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { StaffTimeClockAdapter, type TimeClockShift } from "@/lib/kmbook/time-clock";
+import {
+  StaffTimeClockAdapter,
+  getAttendanceErrorMessage,
+  type TimeClockShift,
+  type TimeClockAction,
+} from "@/lib/kmbook/time-clock";
 import { useOffline } from "./useOffline";
 import { ClockIcon, PlayIcon, PauseIcon, CheckCircleIcon, WifiOffIcon } from "./Icons";
 import styles from "./TimeClockCard.module.css";
@@ -9,19 +14,46 @@ import styles from "./TimeClockCard.module.css";
 interface TimeClockCardProps {
   organizationId: string;
   userId: string;
+  locationId?: string | null;
+  initialShift?: TimeClockShift;
   compact?: boolean;
+  onShiftChange?: (shift: TimeClockShift) => void;
 }
 
-export function TimeClockCard({ organizationId, userId, compact = false }: TimeClockCardProps) {
+export function TimeClockCard({
+  organizationId,
+  userId,
+  locationId = null,
+  initialShift,
+  compact = false,
+  onShiftChange,
+}: TimeClockCardProps) {
   const isOffline = useOffline();
-  const [shift, setShift] = useState<TimeClockShift>(() =>
-    StaffTimeClockAdapter.getTodaySession(organizationId, userId),
+  const [shift, setShift] = useState<TimeClockShift>(
+    () => initialShift ?? StaffTimeClockAdapter.createEmptyShift(organizationId, userId),
   );
+  const [prevInitialShift, setPrevInitialShift] = useState(initialShift);
+  if (initialShift && initialShift !== prevInitialShift) {
+    setPrevInitialShift(initialShift);
+    setShift(initialShift);
+  }
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
-  // Actualizar el cronómetro cada segundo cuando esté trabajando
+  // Si no se proveyó initialShift, cargar la jornada real desde el servidor
+  useEffect(() => {
+    if (!initialShift) {
+      StaffTimeClockAdapter.getTodaySession(organizationId, userId)
+        .then((realShift) => {
+          setShift(realShift);
+          onShiftChange?.(realShift);
+        })
+        .catch(() => {});
+    }
+  }, [organizationId, userId, initialShift, onShiftChange]);
+
+  // Actualizar el cronómetro cada segundo cuando esté trabajando o en pausa
   useEffect(() => {
     if (shift.state !== "TRABAJANDO" && shift.state !== "EN_PAUSA") return;
 
@@ -32,9 +64,10 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
     return () => clearInterval(interval);
   }, [shift.state]);
 
-  const handleAction = async (action: "ENTRAR" | "INICIAR_PAUSA" | "REANUDAR" | "SALIR") => {
-    if (isOffline) {
-      setMessage("Sin conexión. No se puede fichar sin red (modo protegido).");
+  const handleAction = async (action: TimeClockAction) => {
+    // FAIL-CLOSED REAL: Sin conexión no se escribe nada ni se guarda intención local
+    if (isOffline || (typeof navigator !== "undefined" && !navigator.onLine)) {
+      setMessage("No hay conexión. El fichaje necesita conexión para registrarse.");
       return;
     }
 
@@ -42,26 +75,41 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
     setMessage(null);
 
     try {
-      const res = await StaffTimeClockAdapter.recordClockEvent(action, organizationId, userId, !isOffline);
+      const idempotencyKey =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `staff-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+      const res = await StaffTimeClockAdapter.recordClockEvent(
+        action,
+        organizationId,
+        userId,
+        true,
+        locationId,
+        idempotencyKey,
+      );
+
       if (res.shift) {
         setShift(res.shift);
+        onShiftChange?.(res.shift);
       }
       setMessage(res.message);
-    } catch {
-      setMessage("Error al registrar el fichaje.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setMessage(getAttendanceErrorMessage(msg));
     } finally {
       setLoading(false);
     }
   };
 
-  // Calcular tiempo actual trabajado en segundos
+  // Calcular tiempo actual trabajado en segundos derivado de timestamps reales
   let liveWorkedSeconds = shift.totalWorkedSeconds;
   if (shift.state === "TRABAJANDO" && shift.clockInTime) {
     const elapsed = Math.max(0, Math.floor((now - new Date(shift.clockInTime).getTime()) / 1000));
     liveWorkedSeconds = Math.max(0, elapsed - shift.totalBreakSeconds);
   }
 
-  // Calcular tiempo actual de pausa en segundos
+  // Calcular tiempo actual de pausa en segundos derivado de timestamps reales
   let liveBreakSeconds = shift.totalBreakSeconds;
   if (shift.state === "EN_PAUSA" && shift.currentBreakStartedAt) {
     const currentBreak = Math.max(0, Math.floor((now - new Date(shift.currentBreakStartedAt).getTime()) / 1000));
@@ -122,7 +170,7 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
       {isOffline && (
         <div className={styles.offlineWarning}>
           <WifiOffIcon size={14} color="#A33A4B" />
-          <span>Fichaje bloqueado temporalmente sin red.</span>
+          <span>No hay conexión. El fichaje necesita conexión para registrarse.</span>
         </div>
       )}
 
@@ -135,7 +183,7 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
             disabled={loading || isOffline}
           >
             <PlayIcon size={18} color="#FFFFFF" />
-            <span>ENTRAR</span>
+            <span>{loading ? "Registrando..." : "ENTRAR"}</span>
           </button>
         )}
 
@@ -148,7 +196,7 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
               disabled={loading || isOffline}
             >
               <PauseIcon size={16} color="var(--km-oxford)" />
-              <span>PAUSA</span>
+              <span>{loading ? "..." : "PAUSA"}</span>
             </button>
             <button
               type="button"
@@ -157,7 +205,7 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
               disabled={loading || isOffline}
             >
               <ClockIcon size={16} color="#FFFFFF" />
-              <span>SALIR</span>
+              <span>{loading ? "..." : "SALIR"}</span>
             </button>
           </>
         )}
@@ -170,7 +218,7 @@ export function TimeClockCard({ organizationId, userId, compact = false }: TimeC
             disabled={loading || isOffline}
           >
             <PlayIcon size={18} color="#FFFFFF" />
-            <span>REANUDAR TRABAJO</span>
+            <span>{loading ? "Registrando..." : "REANUDAR TRABAJO"}</span>
           </button>
         )}
 
