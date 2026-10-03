@@ -1,0 +1,42 @@
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-xl);
+  margin: 16px 0;
+}
+
+.iconCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--km-fill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  margin-bottom: 6px;
+}
+
+.description {
+  font-size: 0.88rem;
+  color: var(--km-gray);
+  max-width: 320px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.action {
+  margin-top: 4px;
+}

@@ -1,0 +1,61 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.sm {
+  padding: 2px 8px;
+  font-size: 0.7rem;
+}
+
+.pending {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+}
+
+.confirmed {
+  background: var(--status-confirmed-bg);
+  color: var(--status-confirmed);
+}
+
+.arrived {
+  background: var(--status-arrived-bg);
+  color: var(--status-arrived);
+}
+
+.in_service {
+  background: var(--status-in-service-bg);
+  color: var(--status-in-service);
+  font-weight: 700;
+}
+
+.finished {
+  background: var(--status-finished-bg);
+  color: var(--status-finished);
+}
+
+.cancelled {
+  background: var(--status-cancelled-bg);
+  color: var(--status-cancelled);
+}
+
+.no_show {
+  background: var(--status-no-show-bg);
+  color: var(--status-no-show);
+}
+
+.dotPulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--status-in-service);
+  animation: pulse 1.2s infinite;
+}
