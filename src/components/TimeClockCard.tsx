@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   StaffTimeClockAdapter,
   getAttendanceErrorMessage,
@@ -37,6 +38,11 @@ export function TimeClockCard({
     setPrevInitialShift(initialShift);
     setShift(initialShift);
   }
+  const router = useRouter();
+  // El servidor dijo que ya no se puede fichar desde este dispositivo (la
+  // empresa lo desactivó, cambió el salón o no se pudo comprobar): se ocultan
+  // las acciones y se refresca la pantalla desde el servidor.
+  const [blocked, setBlocked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
@@ -94,6 +100,10 @@ export function TimeClockCard({
         onShiftChange?.(res.shift);
       }
       setMessage(res.message);
+      if (res.blocked) {
+        setBlocked(true);
+        router.refresh();
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setMessage(getAttendanceErrorMessage(msg));
@@ -174,8 +184,8 @@ export function TimeClockCard({
         </div>
       )}
 
-      <div className={styles.actionsRow}>
-        {shift.state === "SIN_INICIAR" && (
+      <div className={styles.actionsRow} data-testid="time-clock-actions">
+        {!blocked && shift.state === "SIN_INICIAR" && (
           <button
             type="button"
             className={`${styles.actionBtn} ${styles.btnPrimary}`}
@@ -187,7 +197,7 @@ export function TimeClockCard({
           </button>
         )}
 
-        {shift.state === "TRABAJANDO" && (
+        {!blocked && shift.state === "TRABAJANDO" && (
           <>
             <button
               type="button"
@@ -210,7 +220,7 @@ export function TimeClockCard({
           </>
         )}
 
-        {shift.state === "EN_PAUSA" && (
+        {!blocked && shift.state === "EN_PAUSA" && (
           <button
             type="button"
             className={`${styles.actionBtn} ${styles.btnPrimary}`}
@@ -222,7 +232,7 @@ export function TimeClockCard({
           </button>
         )}
 
-        {shift.state === "FINALIZADO" && (
+        {!blocked && shift.state === "FINALIZADO" && (
           <div className={styles.completedBanner}>
             <CheckCircleIcon size={18} color="var(--status-finished)" />
             <span>¡Jornada de hoy completada! Entrada: {formatClockTime(shift.clockInTime)} · Salida: {formatClockTime(shift.clockOutTime)}</span>

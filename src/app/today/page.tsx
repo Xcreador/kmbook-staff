@@ -106,7 +106,9 @@ export default async function TodayPage() {
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>MI FICHAJE</h2>
             </div>
+            {/* key: al cambiar de organización la tarjeta se monta de cero. */}
             <TimeClockCard
+              key={org.id}
               organizationId={org.id}
               userId={viewer.user.id}
               locationId={defaultLocationId}

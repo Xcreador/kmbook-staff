@@ -1,0 +1,132 @@
+[
+  {
+    "name": "1: A OFF · Hoy sin «Mi fichaje»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "1: A OFF · sin pestaña FICHAJE",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "1: A OFF · /time-clock directo → no disponible",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "1: A OFF · texto claro para la profesional",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "1: A OFF · sin botón ENTRAR",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "1: sin jerga técnica",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "2: A ON · Hoy muestra «Mi fichaje»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "2: A ON · pestaña FICHAJE visible",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "2: A ON · /time-clock disponible",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "2: A ON · ENTRAR registra la jornada en Core",
+    "ok": true,
+    "detail": "1"
+  },
+  {
+    "name": "3: OFF con la pantalla abierta · el servidor no registra la pausa",
+    "ok": true,
+    "detail": "0 → 0"
+  },
+  {
+    "name": "3: la tarjeta deja de ofrecer PAUSA/SALIR",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "3: la pantalla se refresca a «no disponible»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "4: pestaña de A abierta con fichaje disponible",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "4: B OFF · Hoy sin «Mi fichaje»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "4: B OFF · sin pestaña FICHAJE",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "4: B OFF · /time-clock → no disponible",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "4: pestaña antigua de A no puede fichar tras pasar a B",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "5: A ON · Hoy vuelve a mostrar «Mi fichaje»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "5: A ON · estado real de A (Trabajando)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "6: membresía de A inactiva · sin fichaje de A",
+    "ok": true,
+    "detail": "/time-clock"
+  },
+  {
+    "name": "6: Core niega la lectura a la membresía inactiva",
+    "ok": true,
+    "detail": "ERROR:  access_denied"
+  },
+  {
+    "name": "7: Kiosk · el roster de recepción funciona con el ajuste OFF",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "8: Staff no ofrece cambiar el ajuste",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "8: Core rechaza el cambio a una profesional",
+    "ok": true,
+    "detail": "ERROR:  authorization_required"
+  },
+  {
+    "name": "Sin errores de página",
+    "ok": true,
+    "detail": ""
+  }
+]

@@ -143,8 +143,8 @@ describe("KMBOOK Staff — Organization Settings & Read-Only Governance", () => 
       });
 
       expect(res.success).toBe(false);
-      expect(res.message).toContain("desactivado por la empresa");
-      expect(res.message).toContain("Kiosk de recepción");
+      expect(res.message).toContain("Fichaje desde este dispositivo no disponible");
+      expect(res.message).toContain("terminal de recepción");
     });
 
     it("allows clock action when staff_individual_time_clock_enabled is true in Core", async () => {

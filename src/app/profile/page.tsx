@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getStaffViewerContext, clearActiveOrganization, logout } from "@/lib/kmbook/auth";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
-import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
+import { getOrganizationSettings, STAFF_TIME_CLOCK_BLOCKED } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import {
   UserIcon,
@@ -26,7 +26,7 @@ export default async function ProfilePage() {
   const unreadCount = org ? await getUnreadNotificationCount(org.id) : 0;
   const settings = org
     ? await getOrganizationSettings(org.id)
-    : { staffIndividualTimeClockEnabled: false };
+    : STAFF_TIME_CLOCK_BLOCKED;
 
   const handleSwitchOrg = async () => {
     "use server";

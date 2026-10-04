@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getAuthenticatedUser, getStaffViewerContext } from "@/lib/kmbook/auth";
+import { getStaffTimeClockAccess } from "@/lib/kmbook/staff-time-clock-access";
 import { createClient } from "@/lib/supabase/server";
 import {
   ACTION_TO_CORE_MAP,
@@ -9,6 +9,8 @@ import {
   fetchTodaySessionFromSupabase,
   fetchHistoryFromSupabase,
   fetchActiveLocationsFromSupabase,
+  timeClockUnavailableMessage,
+  TIME_CLOCK_UNAVAILABLE_TITLE,
   type TimeClockAction,
   type TimeClockResponse,
   type TimeClockShift,
@@ -16,9 +18,13 @@ import {
 } from "@/lib/kmbook/time-clock";
 
 /**
- * Server Action para fichaje personal autenticado.
- * Llama a la RPC Core `studio_attendance_clock`.
- * Valida membership en sesión, pasa clave de idempotencia UUID y traduce errores.
+ * Fichaje personal desde KMBOOK Staff. TODAS las acciones pasan por
+ * getStaffTimeClockAccess: sesión, organización activa con membresía activa,
+ * organización de la petición == organización activa, y ajuste de Core
+ * `get_staff_organization_settings` estrictamente activado. Si algo falla, no
+ * se escribe ni se lee nada (fail-closed), aunque el cliente esté manipulado.
+ *
+ * Staff nunca cambia el ajuste: eso se hace en Business (Fichaje → Configuración).
  */
 export async function clockAction(params: {
   organizationId: string;
@@ -26,101 +32,63 @@ export async function clockAction(params: {
   action: TimeClockAction;
   idempotencyKey: string;
 }): Promise<TimeClockResponse> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return {
-      success: false,
-      message: "Tu sesión ha caducado. Vuelve a iniciar sesión.",
-    };
-  }
-
-  // Confirmar que el usuario pertenece a la organización
-  const viewer = await getStaffViewerContext();
-  if (!viewer || !viewer.organizations.some((org) => org.id === params.organizationId)) {
-    return {
-      success: false,
-      message: "No tienes permiso para registrar fichajes en esta organización.",
-    };
-  }
-
-  const coreAction = ACTION_TO_CORE_MAP[params.action];
-  if (!coreAction) {
+  const coreAction = ACTION_TO_CORE_MAP[params?.action];
+  if (!coreAction || typeof params.idempotencyKey !== "string" || params.idempotencyKey.length === 0) {
     return { success: false, message: "Acción de fichaje no válida." };
   }
 
-  // Feature Flag: El fichaje individual debe estar habilitado por la organización
-  const { getOrganizationSettings } = await import("@/lib/kmbook/organization-settings");
-  const settings = await getOrganizationSettings(params.organizationId);
-  if (!settings.staffIndividualTimeClockEnabled) {
-    return {
-      success: false,
-      message: "El fichaje individual desde Staff está desactivado por la empresa. Utiliza el Kiosk de recepción.",
-    };
+  const access = await getStaffTimeClockAccess(params.organizationId);
+  if (!access.allowed) {
+    const detail = timeClockUnavailableMessage(access.reason);
+    const bare = access.reason === "session" || access.reason === "organization_changed" || access.reason === "organization";
+    return { success: false, blocked: true, message: bare ? detail : `${TIME_CLOCK_UNAVAILABLE_TITLE}. ${detail}` };
   }
 
   try {
     const supabase = await createClient();
     const { error } = await supabase.rpc("studio_attendance_clock", {
-      p_organization_id: params.organizationId,
+      p_organization_id: access.organization.id,
       p_location_id: params.locationId ?? null,
       p_action: coreAction,
       p_idempotency_key: params.idempotencyKey,
     });
 
     if (error) {
-      return {
-        success: false,
-        message: getAttendanceErrorMessage(error.message),
-      };
+      return { success: false, message: getAttendanceErrorMessage(error.message) };
     }
 
     revalidatePath("/today");
     revalidatePath("/time-clock");
 
-    const updatedShift = await fetchTodaySessionFromSupabase(
-      supabase,
-      params.organizationId,
-      user.id,
-    );
-
-    return {
-      success: true,
-      message: "Fichaje registrado.",
-      shift: updatedShift,
-    };
+    const updatedShift = await fetchTodaySessionFromSupabase(supabase, access.organization.id, access.viewer.user.id);
+    return { success: true, message: "Fichaje registrado.", shift: updatedShift };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    return {
-      success: false,
-      message: getAttendanceErrorMessage(msg),
-    };
+    return { success: false, message: getAttendanceErrorMessage(msg) };
   }
 }
 
 export async function getTodaySessionAction(organizationId: string): Promise<TimeClockShift> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    throw new Error("No autenticado");
+  const access = await getStaffTimeClockAccess(organizationId);
+  if (!access.allowed) {
+    throw new Error(timeClockUnavailableMessage(access.reason));
   }
   const supabase = await createClient();
-  return fetchTodaySessionFromSupabase(supabase, organizationId, user.id);
+  return fetchTodaySessionFromSupabase(supabase, access.organization.id, access.viewer.user.id);
 }
 
-export async function getHistoryAction(
-  organizationId: string,
-  limit = 30,
-): Promise<ShiftHistoryEntry[]> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    return [];
-  }
+export async function getHistoryAction(organizationId: string, limit = 30): Promise<ShiftHistoryEntry[]> {
+  const access = await getStaffTimeClockAccess(organizationId);
+  if (!access.allowed) return [];
   const supabase = await createClient();
-  return fetchHistoryFromSupabase(supabase, organizationId, user.id, limit);
+  return fetchHistoryFromSupabase(supabase, access.organization.id, access.viewer.user.id, limit);
 }
 
 export async function getActiveLocationsAction(
   organizationId: string,
 ): Promise<Array<{ id: string; name: string; timezone: string }>> {
+  const access = await getStaffTimeClockAccess(organizationId);
+  if (!access.allowed) return [];
   const supabase = await createClient();
-  return fetchActiveLocationsFromSupabase(supabase, organizationId);
+  return fetchActiveLocationsFromSupabase(supabase, access.organization.id);
 }

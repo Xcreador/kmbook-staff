@@ -36,7 +36,38 @@ export type TimeClockResponse = {
   success: boolean;
   message: string;
   shift?: TimeClockShift;
+  /** El fichaje desde este dispositivo ya no está disponible: ocultar acciones. */
+  blocked?: boolean;
 };
+
+/**
+ * Textos para la profesional cuando no puede fichar desde este dispositivo.
+ * Lenguaje claro: sin nombres de RPC, ajustes, códigos ni jerga de permisos.
+ */
+export const TIME_CLOCK_UNAVAILABLE_TITLE = "Fichaje desde este dispositivo no disponible";
+
+export type TimeClockUnavailableReason =
+  | "session"
+  | "organization"
+  | "organization_changed"
+  | "disabled"
+  | "unavailable";
+
+export function timeClockUnavailableMessage(reason: TimeClockUnavailableReason): string {
+  switch (reason) {
+    case "session":
+      return "Tu sesión ha caducado. Vuelve a iniciar sesión.";
+    case "organization":
+      return "Elige el salón donde trabajas hoy para continuar.";
+    case "organization_changed":
+      return "Has cambiado de salón. Vuelve a abrir el fichaje.";
+    case "disabled":
+      return "Tu salón registra la jornada en el terminal de recepción.";
+    case "unavailable":
+    default:
+      return "Ahora mismo no podemos comprobarlo. Ficha en el terminal de recepción o inténtalo más tarde.";
+  }
+}
 
 export const ATTENDANCE_ERROR_MAP: Record<string, string> = {
   attendance_already_started: "Ya tienes una jornada iniciada.",
