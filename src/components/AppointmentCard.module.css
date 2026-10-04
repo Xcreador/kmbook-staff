@@ -1,0 +1,113 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  gap: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  user-select: none;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--km-pink);
+  box-shadow: var(--shadow-md);
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.priority {
+  border: 2px solid var(--km-pink);
+  box-shadow: 0 6px 20px rgba(230, 0, 111, 0.12);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFFDFE 100%);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeSection {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.timeMain {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeEnd {
+  font-size: 0.85rem;
+  color: var(--km-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clientRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clientName {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--km-oxford);
+  margin: 0;
+}
+
+.serviceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  color: var(--km-oxford);
+}
+
+.serviceName {
+  font-weight: 400;
+  color: #4A4A4A;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
+}
+
+.duration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--km-gray);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--km-oxford);
+}
+
+.priority .footer {
+  color: var(--km-pink);
+}

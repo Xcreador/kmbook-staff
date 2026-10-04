@@ -1,0 +1,174 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabsBar {
+  display: flex;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+.tabBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--km-gray);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabActive {
+  background: var(--km-fill);
+  color: var(--km-pink);
+  font-weight: 700;
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.introHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--km-gray);
+  line-height: 1.45;
+}
+
+.infoBanner {
+  background: var(--km-fill);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.infoText {
+  font-size: 0.78rem;
+  color: var(--km-gray);
+  line-height: 1.4;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historyCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.historyTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: 8px;
+}
+
+.historyDate {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.historyTotal {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--km-pink);
+  font-variant-numeric: tabular-nums;
+}
+
+.historyDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+
+.detailLabel {
+  color: var(--km-gray);
+}
+
+.detailValue {
+  color: var(--km-oxford);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.locationBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.locationLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--km-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.locationSelect {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--km-fill);
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--km-oxford);
+  font-weight: 500;
+}

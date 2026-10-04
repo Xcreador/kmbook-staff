@@ -1,0 +1,109 @@
+.todayContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.greetingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.greetingRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--km-pink);
+  text-transform: capitalize;
+}
+
+.greetingTitle {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.statsRow {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.statPill {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.statCount {
+  font-weight: 700;
+  color: var(--km-oxford);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  color: var(--km-gray);
+}
+
+.statActive {
+  border-color: var(--km-pink);
+  background: #FFF0F6;
+}
+
+.statActive .statCount {
+  color: var(--km-pink);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--km-oxford);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sectionSubtitle {
+  font-size: 0.75rem;
+  color: var(--km-gray);
+}
+
+.emptyCard {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  color: var(--km-gray);
+  font-size: 0.88rem;
+}

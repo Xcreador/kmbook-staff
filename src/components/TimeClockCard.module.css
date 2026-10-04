@@ -1,0 +1,193 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.compact {
+  padding: 14px;
+  gap: 10px;
+}
+
+.trabajando {
+  border-color: var(--km-pink);
+  box-shadow: 0 4px 18px rgba(230, 0, 111, 0.1);
+}
+
+.en_pausa {
+  border-color: var(--status-no-show);
+  background: #FFFDF8;
+}
+
+.finalizado {
+  border-color: var(--status-finished);
+  background: #F9FDFB;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--km-gray);
+}
+
+.trabajando .statusDot {
+  background: var(--km-pink);
+  animation: pulse 1.2s infinite;
+}
+
+.en_pausa .statusDot {
+  background: var(--status-no-show);
+}
+
+.finalizado .statusDot {
+  background: var(--status-finished);
+}
+
+.statusLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--km-oxford);
+}
+
+.plannedTag {
+  font-size: 0.75rem;
+  color: var(--km-gray);
+  background: var(--km-fill);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.metricsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: var(--km-niebla);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.metricLabel {
+  font-size: 0.72rem;
+  color: var(--km-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.metricValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.metricDivider {
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+}
+
+.messageBox {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  background: var(--km-fill);
+  border-radius: var(--radius-sm);
+  color: var(--km-oxford);
+  text-align: center;
+}
+
+.offlineWarning {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--status-cancelled);
+  font-weight: 500;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 10px;
+}
+
+.actionBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  user-select: none;
+}
+
+.actionBtn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background: var(--km-pink);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(230, 0, 111, 0.28);
+}
+
+.btnSecondary {
+  background: var(--km-fill);
+  color: var(--km-oxford);
+  border: 1px solid var(--color-border);
+}
+
+.btnDanger {
+  background: var(--km-oxford);
+  color: #FFFFFF;
+}
+
+.completedBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--status-finished);
+  width: 100%;
+  justify-content: center;
+  padding: 8px;
+}

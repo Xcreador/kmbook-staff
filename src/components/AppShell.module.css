@@ -1,0 +1,22 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.main {
+  flex: 1;
+  padding-bottom: calc(var(--bottomnav-height) + env(safe-area-inset-bottom, 0px) + 20px);
+}
+
+.noNav {
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+  width: 100%;
+}
