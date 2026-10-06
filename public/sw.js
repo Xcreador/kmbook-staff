@@ -125,7 +125,16 @@ self.addEventListener("push", (event) => {
 // Regla 28: app cerrada -> llega push -> tap -> abre destino correcto (ej. /appointments/{id})
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || "/today";
+  // El destino viaja en el payload push: se resuelve SIEMPRE contra el origen de la app
+  // y sólo se admite el mismo origen («/\\evil.com» o «//evil.com» caerían en otro origen).
+  const targetUrl = (() => {
+    try {
+      const parsed = new URL(String(event.notification.data?.url || "/today").trim(), self.location.origin);
+      return parsed.origin === self.location.origin ? parsed.pathname + parsed.search + parsed.hash : "/today";
+    } catch {
+      return "/today";
+    }
+  })();
 
   event.waitUntil(
     self.clients

@@ -13,12 +13,22 @@ export function getHumanErrorMessage(error: unknown): string {
     ? String((error as { code: unknown }).code)
     : "";
 
-  // Seguridad / RLS / Autenticación
+  // Autenticación ANTES que permisos: `authentication_required` llega con el código 42501
+  // y se mostraba como «sin permiso». Tampoco se busca «session» a secas: «studio_attendance_sessions»
+  // (tabla de fichajes) se mostraba como sesión caducada.
+  if (
+    rawMessage.includes("authentication_required") ||
+    rawMessage.includes("JWT expired") ||
+    rawMessage.includes("session_expired") ||
+    rawMessage.includes("Auth session missing")
+  ) {
+    return "Tu sesión ha caducado. Vuelve a iniciar sesión.";
+  }
+  if (rawMessage.includes("individual_time_clock_disabled")) {
+    return "El fichaje individual no está activado en esta organización.";
+  }
   if (rawCode === "42501" || rawMessage.includes("authorization_required") || rawMessage.includes("permission denied")) {
     return "No tienes permiso para realizar esta acción.";
-  }
-  if (rawMessage.includes("authentication_required") || rawMessage.includes("session")) {
-    return "Tu sesión ha caducado. Vuelve a iniciar sesión.";
   }
 
   // Citas y Ejecución de servicio
