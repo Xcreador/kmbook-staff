@@ -11,9 +11,10 @@ export default async function SelectOrganizationPage() {
     redirect("/login");
   }
 
-  // Si solo tiene 1 organización, auto-seleccionar y entrar a /today
+  // Con 1 sola organización no hay nada que elegir: getStaffViewerContext la resuelve
+  // sola en /today. NO se escribe la cookie aquí: un Server Component no puede
+  // (Next lanza error → 500 al entrar directo a esta ruta).
   if (context.organizations.length === 1) {
-    await setActiveOrganization(context.organizations[0].id);
     redirect("/today");
   }
 

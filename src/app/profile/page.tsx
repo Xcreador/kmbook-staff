@@ -140,7 +140,7 @@ export default async function ProfilePage() {
               <h3 className={styles.cardTitle}>KMBOOK STUDIO</h3>
             </div>
             <a
-              href="https://kmbook.es/app/studio/pos"
+              href={`${process.env.NEXT_PUBLIC_BUSINESS_URL || "https://app.kmbook.es"}/app/studio/pos`}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.actionRow}

@@ -246,15 +246,17 @@ export async function getPlannedShiftForUser(
   return { plannedStart: "09:00", plannedEnd: "17:00" };
 }
 
+import { zonedDateString, zonedDayBoundsIso } from "@/lib/kmbook/zoned-time";
+
 export async function fetchTodaySessionFromSupabase(
   supabase: SupabaseClient<Database>,
   organizationId: string,
   userId: string,
+  timeZone?: string,
 ): Promise<TimeClockShift> {
-  const now = new Date();
-  const dateStr = now.toISOString().slice(0, 10);
-  const startOfDayIso = `${dateStr}T00:00:00.000Z`;
-  const endOfDayIso = `${dateStr}T23:59:59.999Z`;
+  // «Hoy» = día local de la organización (el servidor corre en UTC).
+  const dateStr = zonedDateString(timeZone);
+  const { startIso: startOfDayIso, endIso: endOfDayIso } = zonedDayBoundsIso(timeZone, dateStr);
 
   // 1. Jornada abierta manda (status <> 'finished')
   const { data: openSessions } = await supabase
@@ -446,9 +448,10 @@ export class StaffTimeClockAdapter {
     organizationId: string,
     userId: string,
     supabase?: SupabaseClient<Database>,
+    timeZone?: string,
   ): Promise<TimeClockShift> {
     if (supabase) {
-      return fetchTodaySessionFromSupabase(supabase, organizationId, userId);
+      return fetchTodaySessionFromSupabase(supabase, organizationId, userId, timeZone);
     }
     const { getTodaySessionAction } = await import("@/app/actions/time-clock");
     return getTodaySessionAction(organizationId);

@@ -28,10 +28,10 @@ export default async function TodayPage() {
   const supabase = await createClient();
 
   const [todayData, unreadCount, initialShift, locations] = await Promise.all([
-    getTodayContext(org.id),
+    getTodayContext(org.id, undefined, org.timezone),
     getUnreadNotificationCount(org.id),
     settings.staffIndividualTimeClockEnabled
-      ? StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase)
+      ? StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase, org.timezone)
       : Promise.resolve(null),
     settings.staffIndividualTimeClockEnabled
       ? StaffTimeClockAdapter.getActiveLocations(org.id, supabase)

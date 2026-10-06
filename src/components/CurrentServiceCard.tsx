@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { startStudioServiceAction, finishStudioServiceAction } from "@/app/actions/service-execution";
 import { useOffline } from "./useOffline";
@@ -21,10 +21,21 @@ export function CurrentServiceCard({ visit, organizationId }: CurrentServiceCard
   const [feedback, setFeedback] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
-  const primaryItem = visit.items[0];
-  const isRunning = visit.isRunning || visit.status === "in_service";
+  // Bloqueo síncrono contra el doble toque: `loading` se aplica de forma asíncrona.
+  const busyRef = useRef(false);
+
+  // Visitas multi-servicio: se opera el ítem en curso y, si no hay, el siguiente
+  // sin hacer. Antes se apuntaba siempre al primero y, una vez terminado, el
+  // botón fallaba (`invalid_service_finish`) y los demás servicios no se podían cerrar.
+  const runningItem = visit.items.find((item) => item.isRunning && !item.isDone);
+  const nextItem = visit.items.find((item) => !item.isDone && !item.isRunning);
+  const primaryItem = runningItem ?? nextItem ?? visit.items[0];
+  const isRunning = Boolean(runningItem) || (visit.isRunning && !nextItem);
   const isArrived = visit.status === "arrived";
-  const isExecutable = (isArrived || visit.status === "confirmed" || visit.status === "pending") && !visit.isFinished;
+  // El servidor sólo admite iniciar con la clienta llegada (arrived) o con la
+  // visita ya en curso: ofrecer «Iniciar» en confirmed/pending era un botón que siempre fallaba.
+  const canStart = (isArrived || visit.status === "in_service") && !visit.isFinished && Boolean(nextItem) && !runningItem;
+  const awaitingArrival = (visit.status === "confirmed" || visit.status === "pending") && !visit.isFinished;
 
   // Actualizar el cronómetro si el servicio está en curso
   useEffect(() => {
@@ -45,8 +56,8 @@ export function CurrentServiceCard({ visit, organizationId }: CurrentServiceCard
 
   // Calcular tiempo transcurrido real desde actualStartedAt
   let elapsedMinutes = 0;
-  if (isRunning && primaryItem?.actualStartedAt) {
-    const startMs = new Date(primaryItem.actualStartedAt).getTime();
+  if (runningItem?.actualStartedAt) {
+    const startMs = new Date(runningItem.actualStartedAt).getTime();
     elapsedMinutes = Math.max(0, Math.floor((now - startMs) / 60000));
   }
 
@@ -59,11 +70,13 @@ export function CurrentServiceCard({ visit, organizationId }: CurrentServiceCard
       return;
     }
 
-    if (!primaryItem) return;
+    if (!primaryItem || busyRef.current) return;
 
+    busyRef.current = true;
     setLoading(true);
     setFeedback(null);
     const res = await startStudioServiceAction(organizationId, visit.appointmentId, primaryItem.itemId);
+    busyRef.current = false;
     setLoading(false);
     if (!res.success) {
       setFeedback(res.message);
@@ -79,11 +92,13 @@ export function CurrentServiceCard({ visit, organizationId }: CurrentServiceCard
       return;
     }
 
-    if (!primaryItem) return;
+    if (!primaryItem || busyRef.current) return;
 
+    busyRef.current = true;
     setLoading(true);
     setFeedback(null);
     const res = await finishStudioServiceAction(organizationId, visit.appointmentId, primaryItem.itemId);
+    busyRef.current = false;
     setLoading(false);
     if (!res.success) {
       setFeedback(res.message);
@@ -164,7 +179,7 @@ export function CurrentServiceCard({ visit, organizationId }: CurrentServiceCard
           >
             FINALIZAR SERVICIO
           </Button>
-        ) : isExecutable ? (
+        ) : canStart ? (
           <Button
             variant="primary"
             size="lg"
@@ -176,6 +191,10 @@ export function CurrentServiceCard({ visit, organizationId }: CurrentServiceCard
           >
             INICIAR SERVICIO
           </Button>
+        ) : awaitingArrival ? (
+          <p className={styles.feedbackBox} role="status" data-testid="awaiting-arrival">
+            Esperando la llegada de la clienta. Recepción la marca al entrar.
+          </p>
         ) : null}
 
         <Link href={`/appointments/${visit.appointmentId}`} className={styles.viewLink}>

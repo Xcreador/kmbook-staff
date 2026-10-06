@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import type { AppointmentStatus } from "@/types/database";
+import { zonedDateString, zonedHour } from "@/lib/kmbook/zoned-time";
 
 export type ProfessionalDayRow = {
   appointment_id: string;
@@ -121,8 +122,9 @@ export function getGreeting(hour: number = new Date().getHours()): string {
   return "Buenas noches";
 }
 
-export function formatDateSpanish(date: Date = new Date()): string {
+export function formatDateSpanish(date: Date = new Date(), timeZone?: string): string {
   return date.toLocaleDateString("es-ES", {
+    timeZone,
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -135,11 +137,13 @@ export function formatDateSpanish(date: Date = new Date()): string {
 export async function getTodayContext(
   organizationId: string,
   targetDate?: string,
+  timeZone?: string,
 ): Promise<TodayContext> {
   const now = new Date();
-  const dateStr = targetDate || now.toISOString().slice(0, 10);
-  const formattedDate = formatDateSpanish(now);
-  const greeting = getGreeting(now.getHours());
+  // Día, fecha y saludo en la zona de la organización (el servidor corre en UTC).
+  const dateStr = targetDate || zonedDateString(timeZone, now);
+  const formattedDate = formatDateSpanish(now, timeZone);
+  const greeting = getGreeting(zonedHour(timeZone, now));
 
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_professional_day", {

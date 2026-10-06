@@ -60,7 +60,7 @@ export async function clockAction(params: {
     revalidatePath("/today");
     revalidatePath("/time-clock");
 
-    const updatedShift = await fetchTodaySessionFromSupabase(supabase, access.organization.id, access.viewer.user.id);
+    const updatedShift = await fetchTodaySessionFromSupabase(supabase, access.organization.id, access.viewer.user.id, access.organization.timezone);
     return { success: true, message: "Fichaje registrado.", shift: updatedShift };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -74,7 +74,7 @@ export async function getTodaySessionAction(organizationId: string): Promise<Tim
     throw new Error(timeClockUnavailableMessage(access.reason));
   }
   const supabase = await createClient();
-  return fetchTodaySessionFromSupabase(supabase, access.organization.id, access.viewer.user.id);
+  return fetchTodaySessionFromSupabase(supabase, access.organization.id, access.viewer.user.id, access.organization.timezone);
 }
 
 export async function getHistoryAction(organizationId: string, limit = 30): Promise<ShiftHistoryEntry[]> {
