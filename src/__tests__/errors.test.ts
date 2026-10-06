@@ -39,4 +39,20 @@ describe("KMBOOK Staff — Error Sanitization & Humanization Unit Tests", () => 
       "Sin conexión a internet. Comprueba tu red e inténtalo de nuevo.",
     );
   });
+
+  it("authentication_required con código 42501 es sesión caducada, no «sin permiso»", () => {
+    expect(getHumanErrorMessage({ code: "42501", message: "authentication_required" })).toBe(
+      "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+    );
+  });
+
+  it("un error de la tabla de fichajes (…_sessions) no se presenta como sesión caducada", () => {
+    expect(getHumanErrorMessage(new Error("duplicate key value violates unique constraint on studio_attendance_sessions"))).not.toBe(
+      "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+    );
+  });
+
+  it("fichaje individual desactivado en el servidor tiene mensaje propio", () => {
+    expect(getHumanErrorMessage({ code: "42501", message: "individual_time_clock_disabled" })).toContain("no está activado");
+  });
 });

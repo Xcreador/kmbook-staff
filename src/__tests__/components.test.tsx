@@ -126,4 +126,40 @@ describe("KMBOOK Staff — Component System Tests", () => {
     expect(screen.getByRole("button", { name: /FINALIZAR SERVICIO/i })).toBeDefined();
     expect(screen.getByText(/EN SERVICIO/i)).toBeDefined();
   });
+
+  const baseVisit = (over: Partial<StaffVisit>, items: StaffVisit["items"]): StaffVisit => ({
+    appointmentId: "appt-x",
+    startsAt: "2026-10-03T17:30:00Z",
+    endsAt: "2026-10-03T18:15:00Z",
+    clientName: "Cliente QA",
+    teamNotes: null,
+    status: "arrived",
+    serviceSummary: "Servicios",
+    totalDurationMinutes: 60,
+    isRunning: false,
+    isFinished: false,
+    isPending: false,
+    items,
+    ...over,
+  });
+  const item = (id: string, over: Partial<StaffVisit["items"][number]> = {}) => ({
+    itemId: id, serviceName: `Servicio ${id}`, durationMinutes: 30, actualStartedAt: null, actualFinishedAt: null,
+    actualDurationSeconds: null, isExecutable: true, isRunning: false, isDone: false, ...over,
+  });
+
+  it("una cita confirmada (clienta aún no llegada) NO ofrece Iniciar: espera la llegada", () => {
+    render(<CurrentServiceCard visit={baseVisit({ status: "confirmed" }, [item("a")])} organizationId="org-123" />);
+    expect(screen.queryByRole("button", { name: /INICIAR SERVICIO/i })).toBeNull();
+    expect(screen.getByTestId("awaiting-arrival")).toBeDefined();
+  });
+
+  it("multi-servicio en curso: tras terminar el 1.º ofrece Iniciar el 2.º (no un Finalizar muerto)", () => {
+    const visit = baseVisit({ status: "in_service", isRunning: true }, [
+      item("a", { isDone: true, actualStartedAt: "2026-10-03T17:30:00Z", actualFinishedAt: "2026-10-03T17:55:00Z" }),
+      item("b"),
+    ]);
+    render(<CurrentServiceCard visit={visit} organizationId="org-123" />);
+    expect(screen.getByRole("button", { name: /INICIAR SERVICIO/i })).toBeDefined();
+    expect(screen.queryByRole("button", { name: /FINALIZAR SERVICIO/i })).toBeNull();
+  });
 });

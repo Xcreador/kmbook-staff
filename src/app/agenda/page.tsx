@@ -1,3 +1,4 @@
+import { zonedDateString } from "@/lib/kmbook/zoned-time";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
@@ -26,7 +27,7 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
   }
 
   const org = viewer.activeOrganization;
-  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayStr = zonedDateString(org.timezone);
   const selectedDate = rawDate || todayStr;
   const viewMode = rawView === "week" ? "week" : "day";
 

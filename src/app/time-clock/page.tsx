@@ -61,7 +61,7 @@ export default async function TimeClockPage() {
 
   const [unreadCount, initialShift, initialHistory, locations] = await Promise.all([
     getUnreadNotificationCount(org.id),
-    StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase),
+    StaffTimeClockAdapter.getTodaySession(org.id, viewer.user.id, supabase, org.timezone),
     StaffTimeClockAdapter.getHistory(org.id, viewer.user.id, supabase),
     StaffTimeClockAdapter.getActiveLocations(org.id, supabase),
   ]);
