@@ -6,8 +6,12 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Staff",
     description: "Aplicación móvil de trabajo para profesionales KMBOOK",
     id: "/",
-    start_url: "/today",
+    // «/» decide el destino (login, elegir negocio u Hoy); /today sin sesión acabaría en login sin contexto.
+    start_url: "/?source=pwa",
     scope: "/",
+    lang: "es",
+    dir: "ltr",
+    categories: ["business", "productivity"],
     display: "standalone",
     orientation: "portrait",
     background_color: "#F5F5F8",

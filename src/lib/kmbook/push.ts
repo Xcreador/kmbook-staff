@@ -20,9 +20,18 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
   }
 
   try {
+    // `updateViaCache: "none"`: el navegador nunca reutiliza un sw.js antiguo de su caché HTTP.
     const registration = await navigator.serviceWorker.register("/sw.js", {
       scope: "/",
+      updateViaCache: "none",
     });
+    // Busca una versión nueva al volver a la app (sin recargar nada: el SW nuevo se activa
+    // solo, porque no cachea páginas ni datos de sesión).
+    const checkForUpdate = () => {
+      if (document.visibilityState === "visible") void registration.update().catch(() => undefined);
+    };
+    document.addEventListener("visibilitychange", checkForUpdate);
+    window.addEventListener("online", checkForUpdate);
     return registration;
   } catch {
     return null;

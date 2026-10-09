@@ -25,18 +25,13 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
+  // Limpia TODAS las cachés de versiones anteriores y toma el control sin recargar.
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        }),
-      );
-    }),
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
   );
-  self.clients.claim();
 });
 
 /** Recursos estáticos cacheables: no contienen datos de organización ni de usuaria. */
@@ -122,32 +117,47 @@ self.addEventListener("push", (event) => {
 
 // Notification click deep-linking
 // Regla 28: app cerrada -> llega push -> tap -> abre destino correcto (ej. /appointments/{id})
+// Rutas de la app a las que una notificación puede llevar (todas dentro del scope «/»).
+const DEEP_LINK_PREFIXES = ["/today", "/agenda", "/appointments/", "/waitlist", "/notifications", "/time-clock", "/schedule", "/profile"];
+
+/**
+ * El destino viaja en el payload push: se resuelve SIEMPRE contra el origen de la app,
+ * solo se admite el mismo origen («/\\evil.com» o «//evil.com» caerían en otro origen) y
+ * solo rutas conocidas de la app; cualquier otra cosa cae en /today.
+ */
+function resolveNotificationTarget(raw) {
+  try {
+    const parsed = new URL(String(raw || "/today").trim(), self.location.origin);
+    if (parsed.origin !== self.location.origin) return "/today";
+    const known = DEEP_LINK_PREFIXES.some((prefix) =>
+      prefix.endsWith("/") ? parsed.pathname.startsWith(prefix) : parsed.pathname === prefix || parsed.pathname.startsWith(prefix + "/"),
+    );
+    return known ? parsed.pathname + parsed.search + parsed.hash : "/today";
+  } catch {
+    return "/today";
+  }
+}
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  // El destino viaja en el payload push: se resuelve SIEMPRE contra el origen de la app
-  // y sólo se admite el mismo origen («/\\evil.com» o «//evil.com» caerían en otro origen).
-  const targetUrl = (() => {
-    try {
-      const parsed = new URL(String(event.notification.data?.url || "/today").trim(), self.location.origin);
-      return parsed.origin === self.location.origin ? parsed.pathname + parsed.search + parsed.hash : "/today";
-    } catch {
-      return "/today";
-    }
-  })();
+  const targetUrl = resolveNotificationTarget(event.notification.data && event.notification.data.url);
 
   event.waitUntil(
-    self.clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then((clientList) => {
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && "focus" in client) {
-            client.navigate(targetUrl);
-            return client.focus();
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clientList) => {
+      for (const client of clientList) {
+        if (client.url.startsWith(self.location.origin) && "focus" in client) {
+          try {
+            // navigate() puede rechazar (p. ej. cliente no controlado): se abre ventana como respaldo.
+            const navigated = await client.navigate(targetUrl);
+            return (navigated || client).focus();
+          } catch {
+            break;
           }
         }
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(targetUrl);
-        }
-      }),
+      }
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl);
+      }
+    }),
   );
 });

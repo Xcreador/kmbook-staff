@@ -72,7 +72,7 @@ export function TimeClockCard({
 
   const handleAction = async (action: TimeClockAction) => {
     // FAIL-CLOSED REAL: Sin conexión no se escribe nada ni se guarda intención local
-    if (isOffline || (typeof navigator !== "undefined" && !navigator.onLine)) {
+    if (isOffline) {
       setMessage("No hay conexión. El fichaje necesita conexión para registrarse.");
       return;
     }

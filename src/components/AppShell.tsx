@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
-import { OfflineBanner } from "./OfflineBanner";
-import { registerServiceWorker } from "@/lib/kmbook/push";
 import styles from "./AppShell.module.css";
 
 interface AppShellProps {
@@ -32,13 +30,8 @@ export function AppShell({
   hideNav = false,
   timeClockEnabled = false,
 }: AppShellProps) {
-  useEffect(() => {
-    registerServiceWorker();
-  }, []);
-
   return (
     <div className={styles.shell}>
-      <OfflineBanner />
       <TopBar
         title={title}
         organizationName={organizationName}

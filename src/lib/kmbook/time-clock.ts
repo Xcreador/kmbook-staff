@@ -490,7 +490,7 @@ export class StaffTimeClockAdapter {
     idempotencyKey?: string,
   ): Promise<TimeClockResponse> {
     // FAIL-CLOSED REAL: Sin red no se escribe nada, no se guarda intención, no localStorage, no cola offline
-    if (!isOnline || (typeof navigator !== "undefined" && !navigator.onLine)) {
+    if (!isOnline) {
       return {
         success: false,
         message: "No hay conexión. El fichaje necesita conexión para registrarse.",
