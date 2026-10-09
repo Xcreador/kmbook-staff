@@ -124,6 +124,20 @@ export type Database = {
         };
         Relationships: [];
       };
+      studio_services: {
+        Row: {
+          id: string;
+          organization_id: string;
+          name: string;
+          duration_minutes: number;
+          price_amount: number | null;
+          currency: string;
+          active: boolean;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       studio_professionals: {
         Row: {
           id: string;
@@ -630,6 +644,77 @@ export type Database = {
       get_studio_appointment_deposit: {
         Args: { p_organization_id: string; p_appointment_id: string };
         Returns: unknown;
+      };
+      get_waitlist_board: {
+        Args: { p_organization_id: string; p_status?: string | null };
+        Returns: Json;
+      };
+      add_waitlist_entry: {
+        Args: {
+          p_organization_id: string;
+          p_client_id: string;
+          p_service_id: string;
+          p_preferred_professional_id?: string | null;
+          p_preferred_days?: number[];
+          p_preferred_time_from?: string | null;
+          p_preferred_time_to?: string | null;
+          p_notes?: string | null;
+          p_location_id?: string | null;
+        };
+        Returns: string;
+      };
+      update_waitlist_entry: {
+        Args: {
+          p_organization_id: string;
+          p_entry_id: string;
+          p_preferred_professional_id: string | null;
+          p_preferred_days: number[];
+          p_preferred_time_from: string | null;
+          p_preferred_time_to: string | null;
+          p_notes: string | null;
+          p_status: string;
+        };
+        Returns: undefined;
+      };
+      remove_waitlist_entry: {
+        Args: { p_organization_id: string; p_entry_id: string };
+        Returns: undefined;
+      };
+      get_waitlist_compatible_slots: {
+        Args: { p_organization_id: string; p_entry_id: string; p_date_from: string; p_date_to: string };
+        Returns: Json;
+      };
+      offer_waitlist_slot: {
+        Args: { p_organization_id: string; p_entry_id: string; p_professional_id: string; p_starts_at: string };
+        Returns: Json;
+      };
+      withdraw_waitlist_offer: {
+        Args: { p_organization_id: string; p_offer_id: string; p_reason?: string | null };
+        Returns: undefined;
+      };
+      book_waitlist_entry: {
+        Args: {
+          p_organization_id: string;
+          p_entry_id: string;
+          p_professional_id: string;
+          p_starts_at: string;
+          p_deposit_amount: number | null;
+          p_deposit_method: string | null;
+          p_deposit_provider: string | null;
+          p_deposit_reference: string | null;
+          p_waive: boolean;
+          p_waive_reason: string | null;
+          p_idempotency_key: string;
+        };
+        Returns: Json;
+      };
+      studio_quote_appointment_deposit: {
+        Args: { p_organization_id: string; p_client_id: string; p_service_id: string };
+        Returns: Json;
+      };
+      search_studio_clients_for_booking: {
+        Args: { p_organization_id: string; p_search: string; p_limit?: number; p_offset?: number };
+        Returns: { id: string; first_name: string; last_name: string; phone: string | null; email: string | null }[];
       };
       get_studio_availability_blocks: {
         Args: { p_organization_id: string; p_from: string; p_to: string };

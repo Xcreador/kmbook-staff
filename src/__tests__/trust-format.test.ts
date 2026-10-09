@@ -91,7 +91,7 @@ describe("trust-format", () => {
   it("errores de depósito se traducen a español humano", () => {
     const msg = "Esta cita tiene un depósito pendiente. Cobra o autoriza la excepción desde la agenda de recepción.";
     expect(getHumanErrorMessage({ code: "P0001", message: "deposit_required" })).toBe(msg);
-    expect(getHumanErrorMessage({ code: "42501", message: "deposit_waive_not_allowed" })).toContain("recepción");
+    expect(getHumanErrorMessage({ code: "42501", message: "deposit_waive_not_allowed" })).toContain("permiso para omitir");
     expect(getHumanErrorMessage({ message: "deposit_exceeds_total" })).not.toContain("deposit_");
   });
 });

@@ -6,6 +6,8 @@ import { getAgendaContext } from "@/lib/kmbook/agenda";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { getTrustForAppointments } from "@/lib/kmbook/trust";
+import { getWaitlistActiveCount } from "@/lib/kmbook/waitlist";
+import { WaitlistIndicator } from "@/components/WaitlistIndicator";
 import { TrustBadge } from "@/components/TrustBadge";
 import { AppShell } from "@/components/AppShell";
 import { StatusPill } from "@/components/StatusPill";
@@ -45,7 +47,11 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
   ]);
 
   // Semáforo/depósito: sólo con `trust.view`; sin capacidad o sin RPC queda vacío (sin indicador).
-  const trustByAppointment = await getTrustForAppointments(org.id, agenda.appointments);
+  const [trustByAppointment, waitlistCount] = await Promise.all([
+    getTrustForAppointments(org.id, agenda.appointments),
+    // Sólo con `waitlist.operate`; sin acceso o sin RPC devuelve null y no se pinta nada.
+    getWaitlistActiveCount(org.id),
+  ]);
 
   // Calcular fechas anterior y siguiente
   const curr = new Date(selectedDate);
@@ -82,6 +88,8 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
       timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.container}>
+        <WaitlistIndicator count={waitlistCount} />
+
         {/* Barra de navegación de fecha y selector Día/Semana */}
         <div className={styles.navBar}>
           <div className={styles.dateSelector}>
