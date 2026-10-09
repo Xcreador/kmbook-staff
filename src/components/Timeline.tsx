@@ -1,14 +1,16 @@
 import React from "react";
 import { AppointmentCard } from "./AppointmentCard";
 import type { StaffVisit } from "@/lib/kmbook/today";
+import type { VisitTrust } from "@/lib/kmbook/trust";
 import styles from "./Timeline.module.css";
 
 interface TimelineProps {
   visits: StaffVisit[];
   emptyMessage?: string;
+  trustByAppointment?: Map<string, VisitTrust>;
 }
 
-export function Timeline({ visits, emptyMessage = "No tienes citas programadas para hoy." }: TimelineProps) {
+export function Timeline({ visits, emptyMessage = "No tienes citas programadas para hoy.", trustByAppointment }: TimelineProps) {
   if (visits.length === 0) {
     return (
       <div className={styles.emptyContainer}>
@@ -48,7 +50,11 @@ export function Timeline({ visits, emptyMessage = "No tienes citas programadas p
               </div>
 
               <div className={styles.cardWrapper}>
-                <AppointmentCard visit={visit} priority={visit.status === "in_service"} />
+                <AppointmentCard
+                  visit={visit}
+                  priority={visit.status === "in_service"}
+                  trust={trustByAppointment?.get(visit.appointmentId) ?? null}
+                />
               </div>
             </div>
 

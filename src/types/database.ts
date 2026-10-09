@@ -623,6 +623,14 @@ export type Database = {
           updated_by_name: string | null;
         }[];
       };
+      get_studio_clients_trust: {
+        Args: { p_organization_id: string; p_client_ids: string[] };
+        Returns: { client_id: string; color: string; deposit_percent: number }[];
+      };
+      get_studio_appointment_deposit: {
+        Args: { p_organization_id: string; p_appointment_id: string };
+        Returns: unknown;
+      };
       get_studio_availability_blocks: {
         Args: { p_organization_id: string; p_from: string; p_to: string };
         Returns: {

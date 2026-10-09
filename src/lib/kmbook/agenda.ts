@@ -6,6 +6,7 @@ import type { AppointmentStatus, AvailabilityBlockKind } from "@/types/database"
 
 export type AgendaAppointmentItem = {
   appointmentId: string;
+  clientId: string | null;
   itemId: string;
   status: AppointmentStatus;
   startsAt: string;
@@ -87,6 +88,7 @@ export async function getAgendaContext(
 
   const appointments: AgendaAppointmentItem[] = (agendaRes.data ?? []).map((row) => ({
     appointmentId: row.appointment_id,
+    clientId: row.client_id ?? null,
     itemId: row.item_id,
     status: row.status,
     startsAt: row.item_starts_at || row.starts_at,

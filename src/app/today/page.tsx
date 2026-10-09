@@ -4,6 +4,7 @@ import { getTodayContext } from "@/lib/kmbook/today";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { StaffTimeClockAdapter } from "@/lib/kmbook/time-clock";
+import { getTrustForAppointments } from "@/lib/kmbook/trust";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { CurrentServiceCard } from "@/components/CurrentServiceCard";
@@ -37,6 +38,9 @@ export default async function TodayPage() {
       ? StaffTimeClockAdapter.getActiveLocations(org.id, supabase)
       : Promise.resolve([]),
   ]);
+
+  // Semáforo/depósito: sólo con `trust.view`; sin capacidad o sin RPC queda vacío (sin indicador).
+  const trustByAppointment = await getTrustForAppointments(org.id, todayData.visits);
 
   const defaultLocationId = locations.length > 0 ? locations[0].id : null;
   const professionalName = viewer.profile?.displayName || "Profesional";
@@ -144,7 +148,11 @@ export default async function TodayPage() {
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>DESPUÉS</h2>
             </div>
-            <AppointmentCard visit={followingVisit} priority={false} />
+            <AppointmentCard
+              visit={followingVisit}
+              priority={false}
+              trust={trustByAppointment.get(followingVisit.appointmentId) ?? null}
+            />
           </section>
         )}
 
@@ -160,6 +168,7 @@ export default async function TodayPage() {
 
             <Timeline
               visits={remainingVisits}
+              trustByAppointment={trustByAppointment}
               emptyMessage="No hay más citas programadas para hoy."
             />
           </section>

@@ -5,6 +5,8 @@ import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getAgendaContext } from "@/lib/kmbook/agenda";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
+import { getTrustForAppointments } from "@/lib/kmbook/trust";
+import { TrustBadge } from "@/components/TrustBadge";
 import { AppShell } from "@/components/AppShell";
 import { StatusPill } from "@/components/StatusPill";
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon, CalendarIcon } from "@/components/Icons";
@@ -41,6 +43,9 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
     getUnreadNotificationCount(org.id),
     getOrganizationSettings(org.id),
   ]);
+
+  // Semáforo/depósito: sólo con `trust.view`; sin capacidad o sin RPC queda vacío (sin indicador).
+  const trustByAppointment = await getTrustForAppointments(org.id, agenda.appointments);
 
   // Calcular fechas anterior y siguiente
   const curr = new Date(selectedDate);
@@ -169,6 +174,13 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps) {
                     <h3 className={styles.clientTitle}>{appt.clientName}</h3>
                     <StatusPill status={appt.status} size="sm" />
                   </div>
+
+                  {trustByAppointment.get(appt.appointmentId) && (
+                    <TrustBadge
+                      color={trustByAppointment.get(appt.appointmentId)?.color ?? null}
+                      pendingLabel={trustByAppointment.get(appt.appointmentId)?.pendingLabel ?? null}
+                    />
+                  )}
 
                   <div className={styles.serviceMeta}>
                     <span className={styles.serviceTitle}>{appt.serviceName}</span>
