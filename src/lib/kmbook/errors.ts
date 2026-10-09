@@ -27,6 +27,24 @@ export function getHumanErrorMessage(error: unknown): string {
   if (rawMessage.includes("individual_time_clock_disabled")) {
     return "El fichaje individual no está activado en esta organización.";
   }
+  // Depósitos (semáforo de clientas). Antes de 42501: algunos llegan con ese código.
+  if (rawMessage.includes("deposit_required") || rawMessage.includes("deposit_pending")) {
+    return "Esta cita tiene un depósito pendiente. Cobra o autoriza la excepción desde la agenda de recepción.";
+  }
+  if (rawMessage.includes("deposit_waive_not_allowed") || rawMessage.includes("waive_reason_required")) {
+    return "La omisión del depósito se gestiona desde la agenda de recepción.";
+  }
+  if (rawMessage.includes("deposit_payment_unavailable")) {
+    return "El cobro online no está disponible. El depósito se gestiona desde la agenda de recepción.";
+  }
+  if (
+    rawMessage.includes("deposit_exceeds_total") ||
+    rawMessage.includes("deposit_not_required") ||
+    rawMessage.includes("deposit_not_allowed") ||
+    rawMessage.includes("deposit_payment_method_required")
+  ) {
+    return "No se pudo completar la operación con el depósito. Revísalo desde la agenda de recepción.";
+  }
   if (rawCode === "42501" || rawMessage.includes("authorization_required") || rawMessage.includes("permission denied")) {
     return "No tienes permiso para realizar esta acción.";
   }

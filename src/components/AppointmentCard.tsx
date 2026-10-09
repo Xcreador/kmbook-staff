@@ -3,14 +3,18 @@ import Link from "next/link";
 import { StatusPill } from "./StatusPill";
 import { ClockIcon, UserIcon, ArrowRightIcon } from "./Icons";
 import type { StaffVisit } from "@/lib/kmbook/today";
+import { TrustBadge } from "./TrustBadge";
+import type { VisitTrust } from "@/lib/kmbook/trust";
 import styles from "./AppointmentCard.module.css";
 
 interface AppointmentCardProps {
   visit: StaffVisit;
   priority?: boolean;
+  /** Semáforo y depósito; sólo se informa si la usuaria tiene `trust.view`. */
+  trust?: VisitTrust | null;
 }
 
-export function AppointmentCard({ visit, priority = false }: AppointmentCardProps) {
+export function AppointmentCard({ visit, priority = false, trust = null }: AppointmentCardProps) {
   const formatTime = (isoString: string) => {
     try {
       const date = new Date(isoString);
@@ -46,6 +50,10 @@ export function AppointmentCard({ visit, priority = false }: AppointmentCardProp
           <UserIcon size={18} color="var(--km-oxford)" />
           <h3 className={styles.clientName}>{visit.clientName}</h3>
         </div>
+
+        {trust && (trust.color || trust.pendingLabel) && (
+          <TrustBadge color={trust.color} pendingLabel={trust.pendingLabel} />
+        )}
 
         <div className={styles.serviceRow}>
           <span className={styles.serviceName}>{visit.serviceSummary}</span>

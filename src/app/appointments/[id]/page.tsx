@@ -2,6 +2,9 @@ import { notFound, redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getAppointmentDetail } from "@/lib/kmbook/appointments";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
+import { getAppointmentDepositState } from "@/lib/kmbook/trust";
+import { TrustBadge } from "@/components/TrustBadge";
+import { DepositPanel } from "@/components/DepositPanel";
 import { AppShell } from "@/components/AppShell";
 import { StatusPill } from "@/components/StatusPill";
 import { ServiceExecutionButtons } from "@/components/ServiceExecutionButtons";
@@ -37,7 +40,11 @@ export default async function AppointmentDetailPage({ params }: AppointmentPageP
     notFound();
   }
 
-  const unreadCount = await getUnreadNotificationCount(org.id);
+  // Sólo con `trust.view`; sin capacidad o sin RPC en el entorno -> null (sin indicador).
+  const [unreadCount, deposit] = await Promise.all([
+    getUnreadNotificationCount(org.id),
+    getAppointmentDepositState(org.id, appointment.id),
+  ]);
 
   const formatDateTime = (iso: string) => {
     const d = new Date(iso);
@@ -99,6 +106,9 @@ export default async function AppointmentDetailPage({ params }: AppointmentPageP
               )}
             </div>
           </div>
+
+          {deposit?.trustColor && <TrustBadge color={deposit.trustColor} />}
+          <DepositPanel deposit={deposit} appointmentStatus={appointment.status} />
 
           {/* Aviso Importante (Regla 17: visible pero discreto, no sanitario) */}
           {appointment.importantNotice && (
