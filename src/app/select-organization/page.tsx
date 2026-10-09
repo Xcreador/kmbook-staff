@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getStaffViewerContext, setActiveOrganization, logout } from "@/lib/kmbook/auth";
-import { LibroMLogo, BuildingIcon, ArrowRightIcon, LogOutIcon } from "@/components/Icons";
+import { BrandMark } from "@/components/BrandMark";
+import { BuildingIcon, ArrowRightIcon, LogOutIcon } from "@/components/Icons";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/Button";
 import styles from "./select-organization.module.css";
@@ -36,7 +37,7 @@ export default async function SelectOrganizationPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.header}>
-          <LibroMLogo size={40} />
+          <BrandMark size={40} />
           <h1 className={styles.title}>Selecciona tu salón</h1>
           <p className={styles.subtitle}>
             Hola {context.profile?.displayName || "Profesional"}, elige el negocio donde vas a trabajar hoy:

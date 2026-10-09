@@ -3,7 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LibroMLogo, ArrowLeftIcon, UserIcon } from "./Icons";
+import { ArrowLeftIcon, UserIcon } from "./Icons";
+import { BrandMark } from "./BrandMark";
 import styles from "./TopBar.module.css";
 
 interface TopBarProps {
@@ -48,7 +49,7 @@ export function TopBar({
             </button>
           ) : (
             <Link href="/today" className={styles.logoLink} aria-label="Ir a Hoy">
-              <LibroMLogo size={28} />
+              <BrandMark size={28} />
             </Link>
           )}
 
