@@ -6,41 +6,6 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
   color?: string;
 };
 
-/**
- * KMBOOK Símbolo Aprobado: Libro-M.
- * Monograma geométrico de libro abierto que forma la letra M.
- */
-export function LibroMLogo({ size = 32, className, ...props }: { size?: number | string; className?: string } & React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-label="KMBOOK Libro-M"
-      role="img"
-      {...props}
-    >
-      <rect width="40" height="40" rx="10" fill="#070023" />
-      {/* Geometría Libro-M estilizada con acento KM Pink */}
-      <path
-        d="M9 28V15C9 13.5 10.5 12 12 12C14.5 12 18 14.5 20 16.5C22 14.5 25.5 12 28 12C29.5 12 31 13.5 31 15V28C31 28 27.5 25.5 25 25.5C22.5 25.5 20.5 27.5 20 28C19.5 27.5 17.5 25.5 15 25.5C12.5 25.5 9 28 9 28Z"
-        fill="#FFFFFF"
-      />
-      <path
-        d="M20 16.5V28M15 25.5C12.5 25.5 9 28 9 28V15C9 13.5 10.5 12 12 12C14.5 12 18 14.5 20 16.5C22 14.5 25.5 12 28 12C29.5 12 31 13.5 31 15V28C31 28 27.5 25.5 25 25.5C22.5 25.5 20.5 27.5 20 28Z"
-        stroke="#E6006F"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="20" cy="12.5" r="2.5" fill="#E6006F" />
-    </svg>
-  );
-}
-
 export function CalendarIcon({ size = 20, strokeWidth = 2, color = "currentColor", ...props }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>

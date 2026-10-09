@@ -1,0 +1,46 @@
+.screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px 24px calc(24px + var(--safe-area-bottom));
+  text-align: center;
+  background: var(--color-bg);
+}
+
+.product {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--km-gray);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--km-oxford);
+}
+
+.message {
+  max-width: 320px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--km-gray);
+}
+
+.link {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #635bff;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

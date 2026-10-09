@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { LibroMLogo, LockIcon, MailIcon } from "@/components/Icons";
+import { BrandMark } from "@/components/BrandMark";
+import { LockIcon, MailIcon } from "@/components/Icons";
 import { Button } from "@/components/Button";
 import { getHumanErrorMessage } from "@/lib/kmbook/errors";
 import styles from "./login.module.css";
@@ -50,7 +51,7 @@ export default function LoginPage() {
     <div className={styles.loginPage}>
       <div className={styles.loginCard}>
         <div className={styles.logoHeader}>
-          <LibroMLogo size={48} />
+          <BrandMark size={48} />
           <h1 className={styles.title}>KMBOOK Staff</h1>
           <p className={styles.subtitle}>Tu app de trabajo diario</p>
         </div>

@@ -45,7 +45,6 @@ function isStaticAsset(url) {
     url.pathname.startsWith("/_next/static/") ||
     url.pathname === "/manifest.webmanifest" ||
     url.pathname === "/globals.css" ||
-    /^\/icon(-\d+)?(\.png)?$/.test(url.pathname) ||
     /\.(?:css|js|png|svg|ico|woff2?)$/.test(url.pathname)
   );
 }
@@ -101,8 +100,8 @@ self.addEventListener("push", (event) => {
     const title = payload.title || "KMBOOK Staff";
     const options = {
       body: payload.body || "Tienes una nueva actualización en tu agenda.",
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
       vibrate: [100, 50, 100],
       data: payload.data || { url: "/today" },
       tag: payload.tag || "kmbook-staff-notification",
@@ -115,7 +114,7 @@ self.addEventListener("push", (event) => {
     event.waitUntil(
       self.registration.showNotification("KMBOOK Staff", {
         body: text,
-        icon: "/icon-192.png",
+        icon: "/icons/icon-192.png",
       }),
     );
   }
