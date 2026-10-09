@@ -21,3 +21,9 @@
 .text {
   line-height: 1.35;
 }
+
+.link {
+  color: #FFFFFF;
+  text-decoration: underline;
+  font-weight: 600;
+}

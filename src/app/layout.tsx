@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { ConnectivityProvider } from "@/components/ConnectivityProvider";
+import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
+import { OfflineBanner } from "@/components/OfflineBanner";
 
 export const metadata: Metadata = {
   title: "KMBOOK Staff",
@@ -36,7 +39,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        <ServiceWorkerRegistrar />
+        <ConnectivityProvider>
+          <OfflineBanner />
+          {children}
+        </ConnectivityProvider>
+      </body>
     </html>
   );
 }

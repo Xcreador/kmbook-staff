@@ -1,0 +1,87 @@
+[
+  {
+    "name": "manifest 200 y JSON",
+    "ok": true,
+    "detail": "application/manifest+json"
+  },
+  {
+    "name": "manifest start_url=/?source=pwa, scope=/, standalone",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "icono /icons/icon-192.png servido",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "icono /icons/icon-512.png servido",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "icono /icons/icon-512-maskable.png servido",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "sw.js sin caché HTTP",
+    "ok": true,
+    "detail": "no-cache, no-store, must-revalidate"
+  },
+  {
+    "name": "/api/health HEAD 200 no-store",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "service worker registrado y activo",
+    "ok": true,
+    "detail": "http://127.0.0.1:3002/"
+  },
+  {
+    "name": "<link rel=manifest>",
+    "ok": true,
+    "detail": "/manifest.webmanifest"
+  },
+  {
+    "name": "meta iPhone/tema presentes",
+    "ok": true,
+    "detail": "{\"apple\":\"/icons/apple-touch-icon.png\",\"capable\":\"yes\",\"status\":\"black-translucent\",\"viewport\":\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover\",\"theme\":\"#070023\"}"
+  },
+  {
+    "name": "sin banner con red",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "offline real: banner «Sin conexión — Modo solo lectura»",
+    "ok": true,
+    "detail": "Sin conexión — Modo solo lectura activado. Las acciones de modificación están bloqueadas hasta recuperar la red."
+  },
+  {
+    "name": "recuperación automática sin recargar",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "navigator.onLine=false con servidor vivo NO activa «sin conexión»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "401 → «Sesión caducada», no «Sin conexión»",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "recarga en frío sin servidor: página «Sin conexión» del SW (sin datos cacheados)",
+    "ok": true,
+    "detail": "503"
+  },
+  {
+    "name": "sin errores de página",
+    "ok": true,
+    "detail": ""
+  }
+]

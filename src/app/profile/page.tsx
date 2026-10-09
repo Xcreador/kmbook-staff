@@ -11,9 +11,10 @@ import {
   LogOutIcon,
   RefreshCwIcon,
   MapPinIcon,
-  ExternalLinkIcon,
 } from "@/components/Icons";
 import { Button } from "@/components/Button";
+import { BusinessAccessCard } from "@/components/BusinessAccessCard";
+import { getStudioAccess, NO_STUDIO_ACCESS } from "@/lib/kmbook/studio-access";
 import styles from "./profile.module.css";
 
 export default async function ProfilePage() {
@@ -27,6 +28,8 @@ export default async function ProfilePage() {
   const settings = org
     ? await getOrganizationSettings(org.id)
     : STAFF_TIME_CLOCK_BLOCKED;
+
+  const studioAccess = org ? await getStudioAccess(org.id) : NO_STUDIO_ACCESS;
 
   const handleSwitchOrg = async () => {
     "use server";
@@ -133,29 +136,8 @@ export default async function ProfilePage() {
           </Link>
         </section>
 
-        {/* Acceso opcional a KMBOOK Studio / TPV para recepción/owners (Regla 35) */}
-        {(org?.role === "reception" || org?.role === "manager" || org?.role === "owner") && (
-          <section className={styles.card}>
-            <div className={styles.cardHeader}>
-              <h3 className={styles.cardTitle}>KMBOOK STUDIO</h3>
-            </div>
-            <a
-              href={`${process.env.NEXT_PUBLIC_BUSINESS_URL || "https://app.kmbook.es"}/app/studio/pos`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.actionRow}
-            >
-              <div className={styles.actionLeft}>
-                <ExternalLinkIcon size={20} color="var(--km-pink)" />
-                <div className={styles.actionTexts}>
-                  <span className={styles.actionTitle}>Abrir KMBOOK Studio / TPV</span>
-                  <span className={styles.actionDesc}>Acceso web a caja y administración completa</span>
-                </div>
-              </div>
-              <span className={styles.actionArrow}>↗</span>
-            </a>
-          </section>
-        )}
+        {/* Accesos a Business: solo con permiso expreso de Core, nunca por rol. */}
+        <BusinessAccessCard access={studioAccess} />
 
         {/* Info App & PWA */}
         <section className={styles.appInfoCard}>
