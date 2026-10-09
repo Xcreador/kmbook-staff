@@ -5,6 +5,8 @@ import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { StaffTimeClockAdapter } from "@/lib/kmbook/time-clock";
 import { getTrustForAppointments } from "@/lib/kmbook/trust";
+import { getWaitlistActiveCount } from "@/lib/kmbook/waitlist";
+import { WaitlistIndicator } from "@/components/WaitlistIndicator";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/AppShell";
 import { CurrentServiceCard } from "@/components/CurrentServiceCard";
@@ -40,7 +42,11 @@ export default async function TodayPage() {
   ]);
 
   // Semáforo/depósito: sólo con `trust.view`; sin capacidad o sin RPC queda vacío (sin indicador).
-  const trustByAppointment = await getTrustForAppointments(org.id, todayData.visits);
+  const [trustByAppointment, waitlistCount] = await Promise.all([
+    getTrustForAppointments(org.id, todayData.visits),
+    // Sólo con `waitlist.operate`; sin acceso o sin RPC devuelve null y no se pinta nada.
+    getWaitlistActiveCount(org.id),
+  ]);
 
   const defaultLocationId = locations.length > 0 ? locations[0].id : null;
   const professionalName = viewer.profile?.displayName || "Profesional";
@@ -74,6 +80,8 @@ export default async function TodayPage() {
       timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.todayContainer}>
+        <WaitlistIndicator count={waitlistCount} />
+
         {/* Encabezado Personal: Saludo y Fecha */}
         <section className={styles.greetingSection}>
           <div className={styles.greetingRow}>

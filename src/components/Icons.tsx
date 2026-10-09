@@ -271,3 +271,23 @@ export function CoffeeIcon({ size = 20, strokeWidth = 2, color = "currentColor",
   );
 }
 
+
+export function HourglassIcon({ size = 20, strokeWidth = 2, color = "currentColor", ...props }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M6 2h12" />
+      <path d="M6 22h12" />
+      <path d="M7 2c0 5 3 6 5 10-2 4-5 5-5 10" />
+      <path d="M17 2c0 5-3 6-5 10 2 4 5 5 5 10" />
+    </svg>
+  );
+}
+
+export function PlusIcon({ size = 20, strokeWidth = 2, color = "currentColor", ...props }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+}

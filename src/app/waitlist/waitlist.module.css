@@ -1,0 +1,15 @@
+.page { display: flex; flex-direction: column; gap: 16px; }
+.backRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.detailCard {
+  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow-sm);
+}
+.phone { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--km-pink); min-height: 36px; }
+.notes { font-size: 0.85rem; color: var(--km-oxford); white-space: pre-wrap; }
+.soon { font-size: 0.8rem; color: var(--km-gray); }
+@media (min-width: 768px) {
+  .twoCols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+}
+@media (max-width: 767px) {
+  .twoCols { display: flex; flex-direction: column; gap: 16px; }
+}
