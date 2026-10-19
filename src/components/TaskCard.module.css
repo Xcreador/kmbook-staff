@@ -93,3 +93,20 @@
 }
 .detailLabel { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; color: var(--km-text-3); }
 .detailText { font-size: 0.92rem; color: var(--km-text); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.history {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  font-size: 0.85rem;
+}
+.history li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--km-border);
+  color: var(--km-text);
+}
+.history li:first-child { border-top: 0; }
+.history small { color: var(--km-text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }

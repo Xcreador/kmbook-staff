@@ -609,6 +609,10 @@ export type Database = {
         Args: { p_organization_id: string; p_from?: string | null; p_to?: string | null };
         Returns: Record<string, unknown>[];
       };
+      get_studio_internal_task_events: {
+        Args: { p_organization_id: string; p_task_id: string; p_assignment_id?: string | null };
+        Returns: Record<string, unknown>[];
+      };
       start_studio_internal_task: {
         Args: { p_organization_id: string; p_assignment_id: string };
         Returns: string;
