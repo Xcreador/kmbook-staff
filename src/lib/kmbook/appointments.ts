@@ -41,114 +41,140 @@ export type AppointmentDetail = {
   canOperate: boolean;
 };
 
+/** Resultado explícito: «no existe», «no es tuya» y «error» nunca se confunden. */
+export type AppointmentDetailResult =
+  | { kind: "ok"; appointment: AppointmentDetail }
+  | { kind: "not_found" }
+  | { kind: "forbidden" }
+  | { kind: "session_expired" }
+  | { kind: "error"; error: unknown };
+
+type DetailItemRow = {
+  item_id: string;
+  service_id: string;
+  professional_id: string;
+  service_name: string | null;
+  professional_name: string | null;
+  duration_minutes: number | null;
+  actual_started_at: string | null;
+  actual_finished_at: string | null;
+  actual_duration_seconds: number | null;
+};
+
+type DetailRow = {
+  appointment_id: string;
+  organization_id: string;
+  location_id: string;
+  location_name: string | null;
+  client_id: string | null;
+  status: AppointmentStatus;
+  starts_at: string;
+  ends_at: string;
+  client_name: string | null;
+  client_phone: string | null;
+  client_team_notes: string | null;
+  operational_notes: string | null;
+  cancellation_reason: string | null;
+  items: DetailItemRow[];
+};
+
+/** Traduce el error de la RPC a un resultado de dominio. Exportada para los tests. */
+export function classifyDetailError(error: { code?: string; message?: string }): AppointmentDetailResult {
+  const message = error.message ?? "";
+  if (error.code === "P0002" || message.includes("appointment_not_found")) return { kind: "not_found" };
+  if (message.includes("authentication_required") || message.includes("JWT expired")) {
+    return { kind: "session_expired" };
+  }
+  if (message.includes("appointment_forbidden") || message.includes("authorization_required")) {
+    return { kind: "forbidden" };
+  }
+  return { kind: "error", error };
+}
+
 /**
- * Obtiene el detalle seguro de una cita para la profesional.
- * Regla 16 & 42: Respeta permisos RLS y capabilities.
+ * Detalle de una cita para la profesional, vía la RPC `get_studio_appointment_detail`.
+ * Las tablas de citas no son legibles directamente (RBAC V2): la RPC aplica las capacidades,
+ * redacta los campos y distingue una cita inexistente de una ajena.
  */
 export async function getAppointmentDetail(
   organizationId: string,
   appointmentId: string,
-): Promise<AppointmentDetail | null> {
-  const supabase = await createClient();
+): Promise<AppointmentDetailResult> {
+  // Un id que no es UUID no puede existir: evita ir a la base de datos.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(appointmentId)) {
+    return { kind: "not_found" };
+  }
 
-  const [appointmentResult, itemsResult, locationResult, capabilities] = await Promise.all([
-    supabase
-      .from("studio_appointments")
-      .select("id, organization_id, location_id, client_id, status, starts_at, ends_at, client_name_snapshot, client_phone_snapshot, operational_notes, cancellation_reason")
-      .eq("organization_id", organizationId)
-      .eq("id", appointmentId)
-      .maybeSingle(),
-    supabase
-      .from("studio_appointment_items")
-      .select("id, service_id, professional_id, service_name_snapshot, professional_name_snapshot, duration_minutes, actual_started_at, actual_finished_at, actual_duration_seconds")
-      .eq("organization_id", organizationId)
-      .eq("appointment_id", appointmentId)
-      .order("position", { ascending: true }),
-    supabase.from("locations").select("id, name").eq("organization_id", organizationId),
+  const supabase = await createClient();
+  const [detailRes, capabilities] = await Promise.all([
+    supabase.rpc("get_studio_appointment_detail", {
+      p_organization_id: organizationId,
+      p_appointment_id: appointmentId,
+    }),
     getStaffCapabilities(organizationId),
   ]);
 
-  if (appointmentResult.error || !appointmentResult.data) {
-    return null;
-  }
+  if (detailRes.error) return classifyDetailError(detailRes.error);
+  const row = detailRes.data as unknown as DetailRow | null;
+  if (!row) return { kind: "not_found" };
 
-  const appt = appointmentResult.data;
-  const items = itemsResult.data ?? [];
-  const locations = locationResult.data ?? [];
-  const location = locations.find((l) => l.id === appt.location_id);
-
-  // Obtener "Aviso importante" de la clienta mediante la RPC oficial segura
+  // Aviso importante de la clienta mediante la RPC oficial; un fallo aquí no tumba el detalle.
   let importantNotice: string | null = null;
-  let clientTeamNotes: string | null = null;
-
-  if (appt.client_id) {
+  if (row.client_id) {
     try {
-      const [noticeRes, clientRes] = await Promise.all([
-        supabase.rpc("get_studio_client_notices", {
-          p_organization_id: organizationId,
-          p_client_ids: [appt.client_id],
-        }),
-        capabilities.canViewTeamNotes
-          ? supabase
-              .from("studio_clients")
-              .select("team_notes")
-              .eq("organization_id", organizationId)
-              .eq("id", appt.client_id)
-              .maybeSingle()
-          : Promise.resolve({ data: null }),
-      ]);
-
+      const noticeRes = await supabase.rpc("get_studio_client_notices", {
+        p_organization_id: organizationId,
+        p_client_ids: [row.client_id],
+      });
       if (noticeRes.data && noticeRes.data.length > 0) {
         importantNotice = noticeRes.data[0].notice || null;
       }
-      if (clientRes.data) {
-        clientTeamNotes = clientRes.data.team_notes;
-      }
     } catch {
-      // Ignorar fallo secundario de lectura de aviso
+      // Lectura secundaria.
     }
   }
 
-  const processedItems: AppointmentDetailItem[] = items.map((item) => {
+  const items: AppointmentDetailItem[] = (row.items ?? []).map((item) => {
     const isRunning = !!item.actual_started_at && !item.actual_finished_at;
     const isDone = !!item.actual_finished_at;
-    const isExecutable = (appt.status === "arrived" || appt.status === "in_service") && !isDone;
-
     return {
-      id: item.id,
+      id: item.item_id,
       serviceId: item.service_id,
       professionalId: item.professional_id,
-      serviceName: item.service_name_snapshot,
-      professionalName: item.professional_name_snapshot,
-      durationMinutes: item.duration_minutes,
+      serviceName: item.service_name ?? "Servicio",
+      professionalName: item.professional_name ?? "Profesional",
+      durationMinutes: item.duration_minutes ?? 0,
       actualStartedAt: item.actual_started_at,
       actualFinishedAt: item.actual_finished_at,
       actualDurationSeconds: item.actual_duration_seconds,
-      isExecutable,
+      isExecutable: (row.status === "arrived" || row.status === "in_service") && !isDone,
       isRunning,
       isDone,
     };
   });
 
   return {
-    id: appt.id,
-    organizationId: appt.organization_id,
-    locationId: appt.location_id,
-    locationName: location?.name || "Centro principal",
-    clientId: appt.client_id,
-    clientName: capabilities.canViewClientIdentity ? appt.client_name_snapshot : "Clienta",
-    clientPhone: capabilities.canViewClientContact ? appt.client_phone_snapshot : null,
-    status: appt.status,
-    startsAt: appt.starts_at,
-    endsAt: appt.ends_at,
-    operationalNotes: capabilities.canViewOperationalNotes ? appt.operational_notes : null,
-    cancellationReason: appt.cancellation_reason,
-    importantNotice,
-    teamNotes: clientTeamNotes,
-    items: processedItems,
-    canReschedule: capabilities.canRescheduleAppointment,
-    canCancel: capabilities.canCancelAppointment,
-    canChangeStatus: capabilities.canChangeAppointmentStatus,
-    canOperate: appt.status === "arrived" || appt.status === "in_service",
+    kind: "ok",
+    appointment: {
+      id: row.appointment_id,
+      organizationId: row.organization_id,
+      locationId: row.location_id,
+      locationName: row.location_name || "Centro principal",
+      clientId: row.client_id ?? "",
+      clientName: row.client_name ?? "Clienta",
+      clientPhone: row.client_phone,
+      status: row.status,
+      startsAt: row.starts_at,
+      endsAt: row.ends_at,
+      operationalNotes: row.operational_notes,
+      cancellationReason: row.cancellation_reason,
+      importantNotice,
+      teamNotes: row.client_team_notes,
+      items,
+      canReschedule: capabilities.canRescheduleAppointment,
+      canCancel: capabilities.canCancelAppointment,
+      canChangeStatus: capabilities.canChangeAppointmentStatus,
+      canOperate: row.status === "arrived" || row.status === "in_service",
+    },
   };
 }

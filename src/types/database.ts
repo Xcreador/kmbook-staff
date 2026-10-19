@@ -595,6 +595,10 @@ export type Database = {
         Args: { p_organization_id: string; p_professional_id: string };
         Returns: { content_type: string; data_base64: string; version: number }[];
       };
+      get_studio_appointment_detail: {
+        Args: { p_organization_id: string; p_appointment_id: string };
+        Returns: unknown;
+      };
       get_professional_day: {
         Args: { p_organization_id: string; p_date: string };
         Returns: {

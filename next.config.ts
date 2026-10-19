@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    // «Mi horario» ya no existe en Staff: el horario se gestiona desde Business.
+    return [{ source: "/schedule", destination: "/today", permanent: false }];
+  },
   async headers() {
     return [
       {
