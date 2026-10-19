@@ -12,6 +12,8 @@ export type StaffNotification = {
   createdAt: string;
   isRead: boolean;
   appointmentId?: string;
+  /** Asignación de tarea a la que apunta el aviso (tareas internas). */
+  taskAssignmentId?: string;
 };
 
 export type NotificationsContext = {
@@ -48,6 +50,7 @@ export async function getNotificationsContext(
   const notifications: StaffNotification[] = rawRows.map((row) => {
     const dataObj = typeof row.data === "object" && row.data !== null ? (row.data as Record<string, unknown>) : {};
     const appointmentId = typeof dataObj.appointment_id === "string" ? dataObj.appointment_id : undefined;
+    const taskAssignmentId = typeof dataObj.assignment_id === "string" ? dataObj.assignment_id : undefined;
 
     return {
       id: row.delivery_id,
@@ -59,6 +62,7 @@ export async function getNotificationsContext(
       createdAt: row.created_at,
       isRead: !!row.read_at,
       appointmentId,
+      taskAssignmentId,
     };
   });
 
