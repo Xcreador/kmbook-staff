@@ -24,9 +24,9 @@ describe("manifest PWA", () => {
     expect(m.lang).toBe("es");
     expect(m.theme_color).toBe("#070023"); // --km-oxford
     expect(m.background_color).toBe("#F5F5F8"); // --km-niebla
-    const css = readFileSync(path.resolve(__dirname, "../app/globals.css"), "utf8");
-    expect(css).toContain("--km-oxford: #070023");
-    expect(css).toContain("--km-niebla: #F5F5F8");
+    const css = readFileSync(path.resolve(__dirname, "../styles/v10-tokens.css"), "utf8");
+    expect(css).toContain("--kmbook-v10-oxford: #070023");
+    expect(css).toContain("--km-background: #f5f5f8");
   });
 
   it("start_url dentro del scope y que decide el destino (no /today directo)", () => {
@@ -53,6 +53,7 @@ describe("manifest PWA", () => {
 
 describe("layout · meta tags iPhone", () => {
   it("apple web app, viewport-fit y themeColor", async () => {
+    vi.mock("next/font/google", () => ({ Poppins: () => ({ variable: "poppins" }) }));
     vi.mock("@/components/ConnectivityProvider", () => ({ ConnectivityProvider: ({ children }: { children: unknown }) => children }));
     const layout = await import("@/app/layout");
     expect(layout.metadata.appleWebApp).toMatchObject({ capable: true, title: "KMBOOK Staff" });

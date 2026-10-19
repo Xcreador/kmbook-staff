@@ -1,8 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Poppins } from "next/font/google";
+import "../styles/v10-tokens.css";
 import "./globals.css";
 import { ConnectivityProvider } from "@/components/ConnectivityProvider";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { OfflineBanner } from "@/components/OfflineBanner";
+
+// V10: Poppins es la única familia del producto (misma carga que Business, sin @import externo).
+const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-poppins", display: "swap" });
 
 export const metadata: Metadata = {
   title: "KMBOOK Staff",
@@ -38,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className={poppins.variable}>
       <body>
         <ServiceWorkerRegistrar />
         <ConnectivityProvider>
