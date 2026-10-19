@@ -1,7 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import { toStaffTask, type MyTaskRow, type StaffTask, type TaskStatus } from "@/lib/kmbook/tasks-format";
+import { toStaffTask, toTaskEvents, type MyTaskRow, type StaffTask, type TaskEvent, type TaskEventRow, type TaskStatus } from "@/lib/kmbook/tasks-format";
 
 /**
  * Tareas internas de la profesional autenticada (RPC `get_my_studio_internal_tasks`: solo las suyas,
@@ -69,4 +69,19 @@ export async function getMyTaskLists(organizationId: string, today: string): Pro
 export async function getMyTask(organizationId: string, assignmentId: string): Promise<StaffTask | null> {
   const all = await loadMine(organizationId, { from: null, to: null, statuses: null, includeFlexible: true });
   return all.find((task) => task.assignmentId === assignmentId) ?? null;
+}
+
+/**
+ * Historial de ejecución de una asignación PROPIA. La RPC solo lo devuelve a la profesional titular
+ * (o a quien gestiona tareas); para cualquier otra persona falla y aquí queda vacío.
+ */
+export async function getMyTaskEvents(organizationId: string, taskId: string, assignmentId: string): Promise<TaskEvent[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_studio_internal_task_events", {
+    p_organization_id: organizationId,
+    p_task_id: taskId,
+    p_assignment_id: assignmentId,
+  });
+  if (error) return [];
+  return toTaskEvents((data ?? []) as unknown as TaskEventRow[]);
 }

@@ -128,3 +128,59 @@ export function taskActionError(error: { message?: string } | null | undefined):
   return "No se ha podido actualizar la tarea. Inténtalo de nuevo.";
 }
 
+
+// ----- Historial de ejecución (propio) -----------------------------------------------------
+export type TaskEvent = {
+  id: string;
+  type: string;
+  fromStatus: string | null;
+  toStatus: string | null;
+  actorName: string | null;
+  at: string;
+};
+
+export type TaskEventRow = {
+  event_id: string;
+  event_type: string;
+  from_status: string | null;
+  to_status: string | null;
+  actor_name: string | null;
+  created_at: string;
+};
+
+export const TASK_EVENT_LABEL: Record<string, string> = {
+  assigned: "Tarea asignada",
+  rescheduled: "Horario cambiado",
+  started: "Iniciada",
+  resumed: "Retomada",
+  completed: "Completada",
+  interrupted: "Interrumpida por una reserva",
+  conflict_detected: "Una reserva coincide con la tarea",
+  conflict_resolved: "La reserva ya no coincide",
+  unassigned: "Retirada de la tarea",
+  cancelled: "Cancelada",
+};
+
+/** Solo eventos de ejecución de esta asignación, en orden cronológico; los desconocidos no se muestran. */
+export function toTaskEvents(rows: TaskEventRow[]): TaskEvent[] {
+  return rows
+    .filter((row) => row.event_type in TASK_EVENT_LABEL)
+    .map((row) => ({
+      id: row.event_id,
+      type: row.event_type,
+      fromStatus: row.from_status,
+      toStatus: row.to_status,
+      actorName: row.actor_name,
+      at: row.created_at,
+    }))
+    .sort((a, b) => a.at.localeCompare(b.at));
+}
+
+/** «1 h 05 min» / «25 min» entre inicio y fin reales; null si falta alguno. */
+export function executionDuration(task: Pick<StaffTask, "actualStartedAt" | "actualFinishedAt">): string | null {
+  if (!task.actualStartedAt || !task.actualFinishedAt) return null;
+  const minutes = Math.max(0, Math.round((new Date(task.actualFinishedAt).getTime() - new Date(task.actualStartedAt).getTime()) / 60000));
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return h > 0 ? `${h} h ${String(m).padStart(2, "0")} min` : `${m} min`;
+}

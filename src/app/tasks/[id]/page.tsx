@@ -2,8 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
-import { getMyTask } from "@/lib/kmbook/tasks";
-import { formatTaskRange, TASK_PRIORITY_LABEL } from "@/lib/kmbook/tasks-format";
+import { getMyTask, getMyTaskEvents } from "@/lib/kmbook/tasks";
+import { executionDuration, formatTaskRange, TASK_EVENT_LABEL, TASK_PRIORITY_LABEL } from "@/lib/kmbook/tasks-format";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/Button";
 import { EmptyState } from "@/components/EmptyState";
@@ -27,6 +27,10 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
   const unreadCount = await getUnreadNotificationCount(org.id);
   // La RPC solo devuelve las asignaciones de esta profesional: una tarea ajena es indistinguible de una inexistente.
   const task = UUID.test(id) ? await getMyTask(org.id, id) : null;
+  const events = task ? await getMyTaskEvents(org.id, task.taskId, task.assignmentId) : [];
+  const time = (iso: string) => new Date(iso).toLocaleTimeString("es-ES", { timeZone: org.timezone, hour: "2-digit", minute: "2-digit", hour12: false });
+  const when = (iso: string) => new Date(iso).toLocaleString("es-ES", { timeZone: org.timezone, day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+  const duration = task ? executionDuration(task) : null;
 
   return (
     <AppShell
@@ -77,6 +81,29 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
             )}
 
             <TaskActions organizationId={org.id} assignmentId={task.assignmentId} status={task.status} size="lg" />
+
+            {(task.actualStartedAt || events.length > 0) && (
+              <section className={cardStyles.detailBlock} aria-label="Historial de ejecución">
+                <span className={cardStyles.detailLabel}>MI EJECUCIÓN</span>
+                {task.actualStartedAt && (
+                  <p className={cardStyles.detailText}>
+                    Iniciada a las {time(task.actualStartedAt)}
+                    {task.actualFinishedAt ? ` · finalizada a las ${time(task.actualFinishedAt)}` : " · en curso"}
+                    {duration ? ` · ${duration}` : ""}
+                  </p>
+                )}
+                {events.length > 0 && (
+                  <ol className={cardStyles.history}>
+                    {events.map((event) => (
+                      <li key={event.id}>
+                        <span>{TASK_EVENT_LABEL[event.type]}</span>
+                        <small>{when(event.at)}</small>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+            )}
           </>
         ) : (
           <EmptyState
