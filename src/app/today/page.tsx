@@ -13,6 +13,11 @@ import { CurrentServiceCard } from "@/components/CurrentServiceCard";
 import { AppointmentCard } from "@/components/AppointmentCard";
 import { TimeClockCard } from "@/components/TimeClockCard";
 import { Timeline } from "@/components/Timeline";
+import Link from "next/link";
+import { TaskCard } from "@/components/TaskCard";
+import { TasksRealtime } from "@/components/TasksRealtime";
+import { getMyOpenFlexibleTasks, getMyScheduledTasksForDay } from "@/lib/kmbook/tasks";
+import { buildTimelineEntries, pendingTasks } from "@/lib/kmbook/tasks-format";
 import { SparklesIcon } from "@/components/Icons";
 import styles from "./today.module.css";
 
@@ -48,6 +53,15 @@ export default async function TodayPage() {
     getWaitlistActiveCount(org.id),
   ]);
 
+  // Tareas internas (Business las asigna): las programadas se ordenan con las citas; las flexibles
+  // van como trabajos pendientes. Un fallo o la ausencia de la RPC nunca afecta a las citas.
+  const [scheduledTasks, flexibleTasks] = await Promise.all([
+    getMyScheduledTasksForDay(org.id, todayData.dateStr),
+    getMyOpenFlexibleTasks(org.id),
+  ]);
+  const todaysTasks = buildTimelineEntries([], scheduledTasks).length;
+  const openFlexible = pendingTasks(flexibleTasks);
+
   const defaultLocationId = locations.length > 0 ? locations[0].id : null;
   const professionalName = viewer.profile?.displayName || "Profesional";
 
@@ -80,6 +94,7 @@ export default async function TodayPage() {
       timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
       <div className={styles.todayContainer}>
+        <TasksRealtime organizationId={org.id} />
         <WaitlistIndicator count={waitlistCount} />
 
         {/* Encabezado Personal: Saludo y Fecha */}
@@ -109,6 +124,12 @@ export default async function TodayPage() {
               <span className={styles.statCount}>{todayData.stats.completed}</span>
               <span className={styles.statLabel}>terminadas</span>
             </div>
+            {todaysTasks + openFlexible.length > 0 && (
+              <div className={styles.statPill}>
+                <span className={styles.statCount}>{todaysTasks + openFlexible.length}</span>
+                <span className={styles.statLabel}>{todaysTasks + openFlexible.length === 1 ? "tarea" : "tareas"}</span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -164,21 +185,42 @@ export default async function TodayPage() {
           </section>
         )}
 
-        {/* Prioridad 3: RESTO DEL DÍA (Línea temporal vertical) */}
-        {remainingVisits.length > 0 && (
+        {/* Prioridad 3: RESTO DEL DÍA — citas y tareas programadas en una única secuencia cronológica */}
+        {(remainingVisits.length > 0 || todaysTasks > 0) && (
           <section className={styles.section} aria-label="Resto del día">
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>RESTO DEL DÍA</h2>
               <span className={styles.sectionSubtitle}>
-                {remainingVisits.length} {remainingVisits.length === 1 ? "cita restante" : "citas restantes"}
+                {remainingVisits.length} {remainingVisits.length === 1 ? "cita" : "citas"}
+                {todaysTasks > 0 ? ` · ${todaysTasks} ${todaysTasks === 1 ? "tarea" : "tareas"}` : ""}
               </span>
             </div>
 
             <Timeline
               visits={remainingVisits}
+              tasks={scheduledTasks}
+              organizationId={org.id}
+              timeZone={org.timezone}
               trustByAppointment={trustByAppointment}
               emptyMessage="No hay más citas programadas para hoy."
             />
+          </section>
+        )}
+
+        {/* Trabajos flexibles: sin horario, para cuando haya un hueco. No alteran la disponibilidad. */}
+        {openFlexible.length > 0 && (
+          <section className={styles.section} aria-label="Tareas pendientes">
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>TAREAS PENDIENTES</h2>
+              <Link href="/tasks" className={styles.sectionSubtitle}>
+                Ver todas
+              </Link>
+            </div>
+            <div className={styles.taskStack}>
+              {openFlexible.map((task) => (
+                <TaskCard key={task.assignmentId} task={task} organizationId={org.id} timeZone={org.timezone} />
+              ))}
+            </div>
           </section>
         )}
       </div>

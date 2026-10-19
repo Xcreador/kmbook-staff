@@ -1,0 +1,95 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--km-accent-soft);
+  border: 1.5px dashed color-mix(in srgb, var(--km-accent) 45%, transparent);
+  border-radius: var(--radius-lg);
+  min-width: 0;
+}
+
+.done { opacity: 0.8; }
+
+.link {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: inherit;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--km-accent);
+  color: var(--km-on-accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--km-text-2);
+  font-variant-numeric: tabular-nums;
+  margin-right: auto;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--km-text);
+  overflow-wrap: anywhere;
+}
+
+.priority {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--st-bad-text);
+}
+
+.note {
+  font-size: 0.8rem;
+  color: var(--st-wait-text);
+}
+
+.pill {
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pill_pending { background: var(--st-wait-bg); color: var(--st-wait-text); }
+.pill_in_progress { background: var(--st-live-bg); color: var(--st-live-text); }
+.pill_completed { background: var(--st-ok-bg); color: var(--st-ok-text); }
+.pill_interrupted { background: var(--st-bad-bg); color: var(--st-bad-text); }
+.pill_cancelled { background: var(--st-draft-bg); color: var(--st-draft-text); }
+
+.actions { display: flex; flex-direction: column; gap: 8px; }
+.feedback { padding: 8px 10px; border-radius: var(--radius-sm); background: var(--st-bad-bg); color: var(--st-bad-text); font-size: 0.8rem; }
+.offline { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--st-bad-text); }
+
+.detailBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--km-surface);
+  border: 1px solid var(--km-border);
+  border-radius: var(--radius-md);
+}
+.detailLabel { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; color: var(--km-text-3); }
+.detailText { font-size: 0.92rem; color: var(--km-text); white-space: pre-wrap; overflow-wrap: anywhere; }

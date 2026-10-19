@@ -599,6 +599,24 @@ export type Database = {
         Args: { p_organization_id: string; p_professional_id: string };
         Returns: { content_type: string; data_base64: string; version: number }[];
       };
+      get_my_studio_internal_tasks: {
+        Args: {
+          p_organization_id: string;
+          p_from?: string | null;
+          p_to?: string | null;
+          p_statuses?: string[] | null;
+          p_include_flexible?: boolean;
+        };
+        Returns: Record<string, unknown>[];
+      };
+      start_studio_internal_task: {
+        Args: { p_organization_id: string; p_assignment_id: string };
+        Returns: string;
+      };
+      complete_studio_internal_task: {
+        Args: { p_organization_id: string; p_assignment_id: string };
+        Returns: string;
+      };
       get_professional_day: {
         Args: { p_organization_id: string; p_date: string };
         Returns: {
