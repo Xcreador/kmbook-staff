@@ -4,6 +4,7 @@ import { getNotificationsContext } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import { NotificationsView } from "@/components/NotificationsView";
+import { TasksRealtime } from "@/components/TasksRealtime";
 
 export default async function NotificationsPage() {
   const viewer = await getStaffViewerContext();
@@ -30,7 +31,10 @@ export default async function NotificationsPage() {
       unreadCount={context.unreadCount}
       timeClockEnabled={settings.staffIndividualTimeClockEnabled}
     >
+      {/* Un aviso de tarea llega junto al cambio de la asignación: la lista se recarga sola. */}
+      <TasksRealtime organizationId={org.id} />
       <NotificationsView
+        key={context.notifications[0]?.id ?? "empty"}
         organizationId={org.id}
         initialNotifications={context.notifications}
         initialUnreadCount={context.unreadCount}

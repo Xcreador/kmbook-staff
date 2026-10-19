@@ -21,7 +21,24 @@ async function loadMine(
     p_include_flexible: args.includeFlexible,
   });
   if (error) return [];
-  return ((data ?? []) as unknown as MyTaskRow[]).map(toStaffTask);
+  const tasks = ((data ?? []) as unknown as MyTaskRow[]).map(toStaffTask);
+  return tasks.some((task) => task.startsAt) ? attachConflicts(supabase, organizationId, tasks) : tasks;
+}
+
+/** Marca las tareas cuyo horario coincide con reservas. Solo recuentos: si falla, no hay marca. */
+async function attachConflicts(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  organizationId: string,
+  tasks: StaffTask[],
+): Promise<StaffTask[]> {
+  const { data, error } = await supabase.rpc("get_studio_internal_task_conflicts", {
+    p_organization_id: organizationId,
+    p_from: null,
+    p_to: null,
+  });
+  if (error) return tasks;
+  const bookings = new Map(((data ?? []) as unknown as Array<{ assignment_id: string; bookings: number }>).map((row) => [row.assignment_id, row.bookings]));
+  return tasks.map((task) => ({ ...task, conflictBookings: bookings.get(task.assignmentId) ?? 0 }));
 }
 
 /** Tareas programadas de un día (todos los estados salvo canceladas, para ver también lo hecho). */

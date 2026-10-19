@@ -37,8 +37,13 @@ export function TaskCard({ task, organizationId, timeZone, showActions = true }:
         </div>
         <h3 className={styles.title}>{task.title}</h3>
         {task.priority === "high" && <span className={styles.priority}>Prioridad {TASK_PRIORITY_LABEL[task.priority].toLowerCase()}</span>}
-        {task.status === "interrupted" && (
+        {task.status === "interrupted" ? (
           <p className={styles.note}>Una reserva ha ocupado este horario. Retómala cuando tengas un hueco.</p>
+        ) : (
+          task.conflictBookings > 0 &&
+          (task.status === "pending" || task.status === "in_progress") && (
+            <p className={styles.note}>Hay una reserva que coincide con esta tarea. La reserva tiene prioridad; puedes terminarla después.</p>
+          )
         )}
       </Link>
       {showActions && <TaskActions organizationId={organizationId} assignmentId={task.assignmentId} status={task.status} />}

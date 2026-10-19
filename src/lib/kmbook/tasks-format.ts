@@ -24,6 +24,8 @@ export type StaffTask = {
   actualStartedAt: string | null;
   actualFinishedAt: string | null;
   interruptionReason: string | null;
+  /** Reservas que coinciden con el horario de la tarea (las reservas mandan). */
+  conflictBookings: number;
 };
 
 export type MyTaskRow = {
@@ -68,6 +70,7 @@ export function toStaffTask(row: MyTaskRow): StaffTask {
     actualStartedAt: row.actual_started_at,
     actualFinishedAt: row.actual_finished_at,
     interruptionReason: row.interruption_reason,
+    conflictBookings: 0,
   };
 }
 
