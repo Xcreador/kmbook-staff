@@ -1,12 +1,10 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getStaffViewerContext, clearActiveOrganization, logout } from "@/lib/kmbook/auth";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings, STAFF_TIME_CLOCK_BLOCKED } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import {
   BuildingIcon,
-  CalendarIcon,
   LogOutIcon,
   RefreshCwIcon,
   MapPinIcon,
@@ -111,24 +109,6 @@ export default async function ProfilePage() {
               </form>
             )}
           </div>
-        </section>
-
-        {/* Acceso rápido a Mi Horario */}
-        <section className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>PLANIFICACIÓN Y AUSENCIAS</h3>
-          </div>
-
-          <Link href="/schedule" className={styles.actionRow}>
-            <div className={styles.actionLeft}>
-              <CalendarIcon size={20} color="var(--km-oxford)" />
-              <div className={styles.actionTexts}>
-                <span className={styles.actionTitle}>Ver mi horario semanal</span>
-                <span className={styles.actionDesc}>Turnos planificados, pausas y festivos</span>
-              </div>
-            </div>
-            <span className={styles.actionArrow}>→</span>
-          </Link>
         </section>
 
         {/* Accesos a Business: solo con permiso expreso de Core, nunca por rol. */}

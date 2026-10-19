@@ -156,43 +156,6 @@
   transform: scale(0.96);
 }
 
-.actionRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  text-decoration: none;
-  padding: 4px 0;
-}
-
-.actionLeft {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.actionTexts {
-  display: flex;
-  flex-direction: column;
-}
-
-.actionTitle {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--km-oxford);
-}
-
-.actionDesc {
-  font-size: 0.75rem;
-  color: var(--km-gray);
-  margin-top: 1px;
-}
-
-.actionArrow {
-  font-size: 1.1rem;
-  color: var(--km-pink);
-  font-weight: 700;
-}
-
 .appInfoCard {
   background: var(--km-fill);
   border-radius: var(--radius-md);
