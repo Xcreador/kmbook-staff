@@ -118,7 +118,7 @@ self.addEventListener("push", (event) => {
 // Notification click deep-linking
 // Regla 28: app cerrada -> llega push -> tap -> abre destino correcto (ej. /appointments/{id})
 // Rutas de la app a las que una notificación puede llevar (todas dentro del scope «/»).
-const DEEP_LINK_PREFIXES = ["/today", "/agenda", "/appointments/", "/waitlist", "/notifications", "/time-clock", "/schedule", "/profile"];
+const DEEP_LINK_PREFIXES = ["/today", "/agenda", "/appointments/", "/waitlist", "/notifications", "/time-clock", "/schedule", "/tasks", "/profile"];
 
 /**
  * El destino viaja en el payload push: se resuelve SIEMPRE contra el origen de la app,
