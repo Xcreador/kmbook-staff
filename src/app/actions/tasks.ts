@@ -3,20 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { getAuthenticatedUser } from "@/lib/kmbook/auth";
 import { createClient } from "@/lib/supabase/server";
+import { taskActionError } from "@/lib/kmbook/tasks-format";
 
 export type TaskResult = { success: boolean; message: string; status?: "in_progress" | "completed" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/** Mensajes del contrato de tareas (nunca se muestran códigos de base de datos). */
-export function taskActionError(error: { message?: string } | null | undefined): string {
-  const message = error?.message ?? "";
-  if (message.includes("authentication_required") || message.includes("JWT expired")) return "Tu sesión ha caducado. Vuelve a iniciar sesión.";
-  if (message.includes("task_not_found")) return "La tarea ya no existe.";
-  if (message.includes("task_forbidden") || message.includes("authorization_required")) return "Esta tarea no es tuya.";
-  if (message.includes("invalid_task_transition")) return "La tarea ya no está en un estado que permita esa acción. Actualiza la pantalla.";
-  return "No se ha podido actualizar la tarea. Inténtalo de nuevo.";
-}
 
 async function run(
   rpcName: "start_studio_internal_task" | "complete_studio_internal_task",
@@ -39,8 +30,10 @@ async function run(
   return { success: true, ...ok };
 }
 
-export const startTaskAction = (organizationId: string, assignmentId: string) =>
-  run("start_studio_internal_task", organizationId, assignmentId, { status: "in_progress", message: "Tarea iniciada." });
+export async function startTaskAction(organizationId: string, assignmentId: string): Promise<TaskResult> {
+  return run("start_studio_internal_task", organizationId, assignmentId, { status: "in_progress", message: "Tarea iniciada." });
+}
 
-export const completeTaskAction = (organizationId: string, assignmentId: string) =>
-  run("complete_studio_internal_task", organizationId, assignmentId, { status: "completed", message: "Tarea completada." });
+export async function completeTaskAction(organizationId: string, assignmentId: string): Promise<TaskResult> {
+  return run("complete_studio_internal_task", organizationId, assignmentId, { status: "completed", message: "Tarea completada." });
+}

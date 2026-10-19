@@ -26,12 +26,12 @@ vi.mock("@/lib/supabase/client", () => ({
   }),
 }));
 
-import { completeTaskAction, startTaskAction, taskActionError } from "@/app/actions/tasks";
+import { completeTaskAction, startTaskAction } from "@/app/actions/tasks";
 import { TaskActions } from "@/components/TaskActions";
 import { TaskCard } from "@/components/TaskCard";
 import { TasksRealtime } from "@/components/TasksRealtime";
 import { Timeline } from "@/components/Timeline";
-import { buildTimelineEntries, pendingTasks, taskActions, toStaffTask, type StaffTask } from "@/lib/kmbook/tasks-format";
+import { buildTimelineEntries, pendingTasks, taskActionError, taskActions, toStaffTask, type StaffTask } from "@/lib/kmbook/tasks-format";
 import type { StaffVisit } from "@/lib/kmbook/today";
 
 const ORG = "11111111-1111-4111-8111-111111111111";

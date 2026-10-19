@@ -114,3 +114,14 @@ export function formatTaskRange(task: Pick<StaffTask, "startsAt" | "endsAt">, ti
   const fmt = (iso: string) => new Date(iso).toLocaleTimeString("es-ES", { timeZone, hour: "2-digit", minute: "2-digit", hour12: false });
   return `${fmt(task.startsAt)}–${fmt(task.endsAt)}`;
 }
+
+/** Mensajes del contrato de tareas (nunca se muestran códigos de base de datos). */
+export function taskActionError(error: { message?: string } | null | undefined): string {
+  const message = error?.message ?? "";
+  if (message.includes("authentication_required") || message.includes("JWT expired")) return "Tu sesión ha caducado. Vuelve a iniciar sesión.";
+  if (message.includes("task_not_found")) return "La tarea ya no existe.";
+  if (message.includes("task_forbidden") || message.includes("authorization_required")) return "Esta tarea no es tuya.";
+  if (message.includes("invalid_task_transition")) return "La tarea ya no está en un estado que permita esa acción. Actualiza la pantalla.";
+  return "No se ha podido actualizar la tarea. Inténtalo de nuevo.";
+}
+
