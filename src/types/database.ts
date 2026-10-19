@@ -138,6 +138,18 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      studio_professional_photos: {
+        Row: {
+          organization_id: string;
+          professional_id: string;
+          content_type: string;
+          version: number;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       studio_professionals: {
         Row: {
           id: string;
@@ -582,6 +594,10 @@ export type Database = {
       get_studio_appointment_detail: {
         Args: { p_organization_id: string; p_appointment_id: string };
         Returns: unknown;
+      };
+      get_studio_professional_photo: {
+        Args: { p_organization_id: string; p_professional_id: string };
+        Returns: { content_type: string; data_base64: string; version: number }[];
       };
       get_professional_day: {
         Args: { p_organization_id: string; p_date: string };

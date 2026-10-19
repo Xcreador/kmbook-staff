@@ -1,0 +1,143 @@
+/*
+ * ESPEJO de kmbook/src/styles/v10-tokens.css (KMBOOK Business V10, fuente única de tokens).
+ * No editar a mano: al cambiar los tokens en Business se copia este archivo tal cual.
+ * Staff no tiene dependencia de código con Business; solo comparte este contrato visual.
+ * src/__tests__/v10-tokens.test.ts comprueba que los tokens que Staff usa existen aquí.
+ */
+/*
+ * KMBOOK — V10 Premium. Fuente ÚNICA de tokens de diseño.
+ *
+ * Estructura fija (V10): tipografía, radios, espaciado, sombras, estados.
+ * Identidad interna fija: --kmbook-* no depende de la organización.
+ * Branding conserva V10 y sus presets en espacios de vista previa del negocio;
+ * nunca sobrescribe el cascarón interno.
+ *
+ * Nada fuera de este archivo debe escribir un color de marca literal.
+ */
+:root {
+  /* Acento visual KMBOOK; enlaces/iconos secundarios mantienen mint. */
+  --kmbook-ui-accent: #635bff;
+  --kmbook-ui-accent-hover: color-mix(in srgb, var(--kmbook-ui-accent) 85%, #070023);
+  --kmbook-ui-accent-soft: color-mix(in srgb, var(--kmbook-ui-accent) 10%, #fff);
+  --kmbook-link-icon-accent: #16ecb9;
+  /* Misma proporción RGB oscurecida: AA sobre blanco/fondo claro. */
+  --kmbook-link-icon-accent-text: #0b745b;
+  --kmbook-link-icon-accent-hover: #095e4a;
+  --kmbook-link-icon-accent-soft: color-mix(in srgb, var(--kmbook-link-icon-accent) 10%, #fff);
+  --kmbook-link-icon-ring: var(--kmbook-link-icon-accent-text);
+  /* CTA rosa V10; Oxford sigue siendo la identidad oscura fija. */
+  --kmbook-v10-oxford: #070023;
+  --kmbook-action-accent: #e6006f;
+  --kmbook-action-accent-hover: color-mix(in srgb, var(--kmbook-action-accent) 85%, var(--kmbook-v10-oxford));
+  --kmbook-action-accent-foreground: #ffffff;
+  --kmbook-action-accent-disabled: var(--km-fill);
+  --kmbook-secondary-accent: #e6006f;
+  --km-primary: var(--kmbook-v10-oxford);
+  /* Compatibilidad de selecciones anteriores, nunca de botones primarios. */
+  --kmbook-accent: var(--kmbook-ui-accent);
+  --kmbook-accent-hover: var(--kmbook-ui-accent-hover);
+  --kmbook-accent-soft: var(--kmbook-ui-accent-soft);
+  --kmbook-accent-foreground: var(--kmbook-ui-accent);
+  --kmbook-focus-ring: var(--kmbook-ui-accent);
+  --km-accent: var(--kmbook-ui-accent);
+  --km-on-primary: #ffffff;
+  --km-on-accent: #ffffff;
+
+  /* Superficies */
+  --km-surface: #ffffff;
+  --km-surface-2: #fafafc;
+  --km-background: #f5f5f8;
+  --km-fill: #f2f2f7;
+  --km-border: #e6e5ec;
+
+  /* Texto (derivado; no configurable) */
+  --km-text: var(--km-primary);
+  --km-text-2: #5b5870;
+  --km-text-3: #8c899e;
+
+  /* Derivados de marca */
+  --km-primary-soft: color-mix(in srgb, var(--km-primary) 6%, #fff);
+  --km-accent-soft: var(--kmbook-ui-accent-soft);
+  --km-primary-hover: color-mix(in srgb, var(--km-primary) 84%, #fff);
+  --km-accent-hover: var(--kmbook-accent-hover);
+  /* Alias públicos para la misma identidad interna fija. */
+  --km-link: var(--kmbook-accent);
+  --km-link-hover: var(--kmbook-accent-hover);
+  --km-link-ring: color-mix(in srgb, var(--km-link) 24%, transparent);
+  --km-focus-ring: 0 0 0 2px var(--km-surface), 0 0 0 4px var(--kmbook-focus-ring);
+
+  /* Estados semánticos: universales, NO dependen del Branding */
+  --st-ok: #1a9e5b; --st-ok-text: #13693e; --st-ok-bg: #e9f6ef;
+  --st-info: #2f6be0; --st-info-text: #1f4ca8; --st-info-bg: #eaf0fd;
+  --st-live: #0d8f8f; --st-live-text: #0a6464; --st-live-bg: #e4f4f4;
+  --st-wait: #d98a0b; --st-wait-text: #8a5300; --st-wait-bg: #fdf3e1;
+  --st-bad: #d63b3b; --st-bad-text: #a12626; --st-bad-bg: #fcecec;
+  --st-draft: #8c899e; --st-draft-text: #5b5870; --st-draft-bg: #f2f2f7;
+
+  /* Agenda: hora actual. Rojo fijo, 1 px, siempre sobre las citas. */
+  --km-now: #e0182d;
+
+  /* Familias de servicio (tinte de las citas) */
+  --fam-hands: #fceef3; --fam-hands-line: #f6d9e4; --fam-hands-dot: #e7a3bd;
+  --fam-lash: #f1eefb; --fam-lash-line: #e2dcf5; --fam-lash-dot: #b9a7ea;
+  --fam-face: #eaf6f1; --fam-face-line: #d3ece2; --fam-face-dot: #8ccdb6;
+  --fam-feet: #fbf4e8; --fam-feet-line: #f1e3c9; --fam-feet-dot: #f0c27b;
+
+  /* Gráficas (Estadísticas): validados para daltonismo */
+  --viz-1: #5146c8;
+  --viz-2: #d9822b;
+
+  /* Forma: sistema cerrado */
+  --r-8: 8px;
+  --r-12: 12px;
+  --r-16: 16px;
+  --r-20: 20px;
+
+  /* Espaciado: múltiplos de 4 */
+  --sp-4: 4px; --sp-8: 8px; --sp-12: 12px; --sp-16: 16px;
+  --sp-20: 20px; --sp-24: 24px; --sp-32: 32px; --sp-40: 40px;
+
+  /* Sombras: tres niveles */
+  --sh-1: 0 1px 2px rgba(7, 0, 35, 0.04), 0 1px 3px rgba(7, 0, 35, 0.04);
+  --sh-2: 0 8px 24px -4px rgba(7, 0, 35, 0.12), 0 2px 6px rgba(7, 0, 35, 0.06);
+  --sh-3: 0 24px 64px -12px rgba(7, 0, 35, 0.24), 0 4px 12px rgba(7, 0, 35, 0.08);
+
+  /* Tipografía: Poppins */
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-kmbook: var(--font-sans);
+  --fs-display: 32px; --lh-display: 40px;
+  --fs-title: 24px; --lh-title: 32px;
+  --fs-section: 16px; --lh-section: 24px;
+  --fs-body: 14px; --lh-body: 20px;
+  --fs-meta: 12px; --lh-meta: 16px;
+  --fs-label: 11px; --lh-label: 16px;
+
+  /* Alias heredados (pantallas anteriores a V10): apuntan a V10 */
+  --bg: var(--km-background);
+  --ink: var(--km-text);
+  --muted: var(--km-text-2);
+  --line: var(--km-border);
+  --line-control: #c9c7d3;
+  --brand: var(--kmbook-accent);
+  --brand-dark: var(--kmbook-accent-hover);
+  --surface: var(--km-surface);
+  --danger: var(--st-bad-text);
+  --success: var(--st-ok-text);
+}
+
+body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+/* Foco V10: anillo de acento, igual en toda la aplicación. */
+:focus-visible,
+a:focus-visible,
+button:focus-visible,
+.button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--km-accent);
+  outline-offset: 2px;
+}

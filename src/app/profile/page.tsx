@@ -4,13 +4,13 @@ import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
 import { getOrganizationSettings, STAFF_TIME_CLOCK_BLOCKED } from "@/lib/kmbook/organization-settings";
 import { AppShell } from "@/components/AppShell";
 import {
-  UserIcon,
   BuildingIcon,
   LogOutIcon,
   RefreshCwIcon,
   MapPinIcon,
 } from "@/components/Icons";
 import { Button } from "@/components/Button";
+import { Avatar } from "@/components/Avatar";
 import { BusinessAccessCard } from "@/components/BusinessAccessCard";
 import { getStudioAccess, NO_STUDIO_ACCESS } from "@/lib/kmbook/studio-access";
 import styles from "./profile.module.css";
@@ -64,18 +64,13 @@ export default async function ProfilePage() {
         {/* Cabecera del usuario */}
         <section className={styles.userCard}>
           <div className={styles.avatarWrapper}>
-            {viewer.profile?.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={viewer.profile.avatarUrl}
-                alt={viewer.profile.displayName}
-                className={styles.avatarLarge}
-              />
-            ) : (
-              <div className={styles.avatarPlaceholderLarge}>
-                <UserIcon size={36} color="var(--km-oxford)" />
-              </div>
-            )}
+            <Avatar
+              src={viewer.profile?.avatarUrl}
+              name={viewer.profile?.displayName ?? "Profesional"}
+              size={64}
+              className={styles.avatarLarge}
+              placeholderClassName={styles.avatarPlaceholderLarge}
+            />
           </div>
 
           <div className={styles.userMeta}>

@@ -1,45 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
-
 :root {
-  /* KMBOOK V10 Structural Colors */
-  --km-oxford: #070023;
-  --km-pink: #E6006F;
-  --km-white: #FFFFFF;
-  --km-niebla: #F5F5F8;
-  --km-fill: #F2F2F7;
-  --km-gray: #8E8E93;
+  /* Los valores salen de styles/v10-tokens.css (espejo de Business V10).
+     Los nombres --km-oxford/--km-pink/--color-* se conservan como alias para no reescribir
+     todos los módulos CSS de Staff: ya no definen colores propios. */
+  --km-oxford: var(--km-primary);
+  --km-pink: var(--kmbook-action-accent);
+  --km-white: var(--km-surface);
+  --km-niebla: var(--km-background);
+  --km-gray: var(--km-text-3);
 
-  /* Semantic UI Tokens */
-  --color-bg: var(--km-niebla);
-  --color-surface: var(--km-white);
+  --color-bg: var(--km-background);
+  --color-surface: var(--km-surface);
   --color-surface-subtle: var(--km-fill);
-  --color-text: var(--km-oxford);
-  --color-text-muted: var(--km-gray);
-  --color-border: #E5E5EA;
-  --color-border-subtle: #ECECEE;
+  --color-text: var(--km-text);
+  --color-text-muted: var(--km-text-2);
+  --color-border: var(--km-border);
+  --color-border-subtle: var(--km-border);
 
-  /* Brand Dynamic Slots (customizable per tenant branding) */
-  --color-brand-primary: var(--km-oxford);
-  --color-brand-accent: var(--km-pink);
+  --color-brand-primary: var(--km-primary);
+  --color-brand-accent: var(--kmbook-action-accent);
 
-  /* Status Tokens */
-  --status-pending: #8E8E93;
-  --status-pending-bg: #F2F2F7;
-  --status-confirmed: #0066CC;
-  --status-confirmed-bg: #EBF3FF;
-  --status-arrived: #7C3AED;
-  --status-arrived-bg: #F5F3FF;
-  --status-in-service: #E6006F;
-  --status-in-service-bg: #FFF0F6;
-  --status-finished: #28764E;
-  --status-finished-bg: #EBF7F0;
-  --status-cancelled: #A33A4B;
-  --status-cancelled-bg: #FDF2F4;
-  --status-no-show: #D97706;
-  --status-no-show-bg: #FEF3C7;
+  /* Estados de cita: misma asignación semántica que la agenda de Business. */
+  --status-pending: var(--st-wait-text);
+  --status-pending-bg: var(--st-wait-bg);
+  --status-confirmed: var(--st-info-text);
+  --status-confirmed-bg: var(--st-info-bg);
+  --status-arrived: var(--st-live-text);
+  --status-arrived-bg: var(--st-live-bg);
+  --status-in-service: var(--st-live-text);
+  --status-in-service-bg: var(--st-live-bg);
+  --status-finished: var(--st-ok-text);
+  --status-finished-bg: var(--st-ok-bg);
+  --status-cancelled: var(--st-draft-text);
+  --status-cancelled-bg: var(--st-draft-bg);
+  --status-no-show: var(--st-bad-text);
+  --status-no-show-bg: var(--st-bad-bg);
 
-  /* Typography */
-  --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family: var(--font-sans);
 
   /* Layout & Safe Areas */
   --safe-area-top: env(safe-area-inset-top, 0px);
@@ -47,17 +43,16 @@
   --topbar-height: 58px;
   --bottomnav-height: 64px;
 
-  /* Geometry & Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  /* Forma y sombras: escala cerrada de Business (--r-*, --sh-*). */
+  --radius-sm: var(--r-8);
+  --radius-md: var(--r-12);
+  --radius-lg: var(--r-16);
+  --radius-xl: var(--r-20);
   --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(7, 0, 35, 0.05);
-  --shadow-md: 0 4px 14px rgba(7, 0, 35, 0.07);
-  --shadow-lg: 0 10px 25px rgba(7, 0, 35, 0.10);
+  --shadow-sm: var(--sh-1);
+  --shadow-md: var(--sh-2);
+  --shadow-lg: var(--sh-3);
   --shadow-bottom-bar: 0 -4px 16px rgba(7, 0, 35, 0.06);
 }
 
@@ -94,7 +89,7 @@ button, input, select, textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--km-pink);
+  outline: 2px solid var(--kmbook-focus-ring);
   outline-offset: 2px;
 }
 

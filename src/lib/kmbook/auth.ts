@@ -37,6 +37,8 @@ export type StaffLocation = {
 
 export type StaffProfessionalRecord = {
   id: string;
+  /** Foto configurada en Business (null = sin foto: se muestra el avatar genérico). */
+  photoUrl: string | null;
   organizationId: string;
   displayName: string;
   calendarColor: string;
@@ -51,6 +53,11 @@ export type StaffViewerContext = {
   activeOrganization: StaffOrganization | null;
   professionalRecord: StaffProfessionalRecord | null;
 };
+
+/** URL de la foto del profesional; `version` renueva la caché cuando se cambia en Business. */
+export function professionalPhotoUrl(organizationId: string, professionalId: string, version: number): string {
+  return `/api/professional-photo/${professionalId}?organization=${organizationId}&v=${version}`;
+}
 
 export const getAuthenticatedUser = cache(async (): Promise<StaffUser | null> => {
   try {
@@ -147,15 +154,30 @@ export const getStaffViewerContext = cache(async (): Promise<StaffViewerContext 
     ? (professionalsData ?? []).find((p) => p.organization_id === activeOrg!.id) ?? null
     : null;
 
+  // La foto es la del PROFESIONAL en Business (studio_professional_photos), no la de la cuenta.
+  let photoUrl: string | null = null;
+  if (activeOrg && activeProf) {
+    const { data: photo } = await supabase
+      .from("studio_professional_photos")
+      .select("version")
+      .eq("organization_id", activeOrg.id)
+      .eq("professional_id", activeProf.id)
+      .maybeSingle();
+    if (photo) photoUrl = professionalPhotoUrl(activeOrg.id, activeProf.id, photo.version);
+  }
+
   return {
     user,
-    profile: profile ? { id: profile.id, displayName: profile.display_name, avatarUrl: profile.avatar_url } : null,
+    profile: profile
+      ? { id: profile.id, displayName: profile.display_name, avatarUrl: activeProf ? photoUrl : null }
+      : null,
     organizations,
     locations: activeOrg ? locations.filter((l) => l.organizationId === activeOrg.id) : locations,
     activeOrganization: activeOrg,
     professionalRecord: activeProf
       ? {
           id: activeProf.id,
+          photoUrl,
           organizationId: activeProf.organization_id,
           displayName: activeProf.display_name,
           calendarColor: activeProf.calendar_color,

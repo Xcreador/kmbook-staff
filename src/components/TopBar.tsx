@@ -3,7 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeftIcon, UserIcon } from "./Icons";
+import { ArrowLeftIcon } from "./Icons";
+import { Avatar } from "./Avatar";
 import { BrandMark } from "./BrandMark";
 import styles from "./TopBar.module.css";
 
@@ -67,14 +68,13 @@ export function TopBar({
 
         <div className={styles.right}>
           <Link href="/profile" className={styles.profileLink} aria-label="Ver perfil de usuario">
-            {avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatarUrl} alt={userName} className={styles.avatarImg} />
-            ) : (
-              <div className={styles.avatarPlaceholder} title={userName}>
-                <UserIcon size={16} color="var(--km-oxford)" />
-              </div>
-            )}
+            <Avatar
+              src={avatarUrl}
+              name={userName ?? "Perfil"}
+              size={34}
+              className={styles.avatarImg}
+              placeholderClassName={styles.avatarPlaceholder}
+            />
           </Link>
         </div>
       </div>
