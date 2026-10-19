@@ -52,6 +52,7 @@ const task = (over: Partial<StaffTask> = {}): StaffTask => ({
   actualStartedAt: null,
   actualFinishedAt: null,
   interruptionReason: null,
+  conflictBookings: 0,
   ...over,
 });
 
@@ -223,5 +224,23 @@ describe("TaskCard", () => {
   it("una flexible se presenta sin horario", () => {
     render(<TaskCard task={task({ scheduleKind: "flexible", startsAt: null, endsAt: null })} organizationId={ORG} />);
     expect(screen.getByText("Cuando haya un hueco")).toBeDefined();
+  });
+});
+
+describe("Prioridad de las reservas en Staff", () => {
+  it("una tarea en curso con una reserva encima conserva sus acciones y explica la prioridad de la reserva", () => {
+    render(<TaskCard task={task({ status: "in_progress", conflictBookings: 1 })} organizationId={ORG} timeZone="UTC" />);
+    expect(screen.getByText(/La reserva tiene prioridad; puedes terminarla después/)).toBeDefined();
+    expect(screen.getByText("Marcar como completada")).toBeDefined();
+  });
+
+  it("sin conflicto no se muestra ninguna nota", () => {
+    render(<TaskCard task={task({ status: "in_progress" })} organizationId={ORG} timeZone="UTC" />);
+    expect(screen.queryByText(/prioridad/)).toBeNull();
+  });
+
+  it("una tarea completada con una reserva encima no se marca", () => {
+    render(<TaskCard task={task({ status: "completed", conflictBookings: 2 })} organizationId={ORG} timeZone="UTC" showActions={false} />);
+    expect(screen.queryByText(/coincide/)).toBeNull();
   });
 });

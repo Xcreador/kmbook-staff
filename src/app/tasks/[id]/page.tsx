@@ -53,8 +53,13 @@ export default async function TaskDetailPage({ params }: { params: Promise<{ id:
               </div>
               <h2 className={cardStyles.title}>{task.title}</h2>
               <span className={cardStyles.priority}>{task.priority === "high" ? `Prioridad ${TASK_PRIORITY_LABEL[task.priority].toLowerCase()}` : ""}</span>
-              {task.status === "interrupted" && (
+              {task.status === "interrupted" ? (
                 <p className={cardStyles.note}>Una reserva ha ocupado este horario. Retómala cuando tengas un hueco.</p>
+              ) : (
+                task.conflictBookings > 0 &&
+                (task.status === "pending" || task.status === "in_progress") && (
+                  <p className={cardStyles.note}>Hay una reserva que coincide con esta tarea. La reserva tiene prioridad; puedes terminarla después.</p>
+                )
               )}
             </section>
 

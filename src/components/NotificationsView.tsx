@@ -97,6 +97,7 @@ export function NotificationsView({
         <div className={styles.list}>
           {notifications.map((item) => {
             const hasLink = !!item.appointmentId;
+            const hasTaskLink = !hasLink && !!item.taskAssignmentId;
 
             return (
               <div
@@ -115,6 +116,19 @@ export function NotificationsView({
                 </div>
 
                 <p className={styles.itemBody}>{item.body}</p>
+
+                {hasTaskLink && (
+                  <div className={styles.cardFooter}>
+                    <Link
+                      href={`/tasks/${item.taskAssignmentId}`}
+                      className={styles.deepLink}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span>Abrir tarea</span>
+                      <ArrowRightIcon size={14} color="var(--km-pink)" />
+                    </Link>
+                  </div>
+                )}
 
                 {hasLink && (
                   <div className={styles.cardFooter}>
