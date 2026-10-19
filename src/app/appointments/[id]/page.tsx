@@ -1,4 +1,5 @@
-import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getStaffViewerContext } from "@/lib/kmbook/auth";
 import { getAppointmentDetail } from "@/lib/kmbook/appointments";
 import { getUnreadNotificationCount } from "@/lib/kmbook/notifications";
@@ -7,6 +8,10 @@ import { TrustBadge } from "@/components/TrustBadge";
 import { DepositPanel } from "@/components/DepositPanel";
 import { AppShell } from "@/components/AppShell";
 import { StatusPill } from "@/components/StatusPill";
+import { EmptyState } from "@/components/EmptyState";
+import { ErrorState } from "@/components/ErrorState";
+import { Button } from "@/components/Button";
+import { getHumanErrorMessage } from "@/lib/kmbook/errors";
 import { ServiceExecutionButtons } from "@/components/ServiceExecutionButtons";
 import {
   UserIcon,
@@ -15,6 +20,7 @@ import {
   PhoneIcon,
   AlertTriangleIcon,
   CalendarPlusIcon,
+  LockIcon,
 } from "@/components/Icons";
 import styles from "./appointment.module.css";
 
@@ -34,11 +40,53 @@ export default async function AppointmentDetailPage({ params }: AppointmentPageP
   }
 
   const org = viewer.activeOrganization;
-  const appointment = await getAppointmentDetail(org.id, id);
+  const result = await getAppointmentDetail(org.id, id);
 
-  if (!appointment) {
-    notFound();
+  if (result.kind === "session_expired") {
+    redirect("/login");
   }
+
+  if (result.kind !== "ok") {
+    const unread = await getUnreadNotificationCount(org.id);
+    const backAction = (
+      <Link href="/today">
+        <Button variant="secondary" size="sm">Volver a Mi jornada</Button>
+      </Link>
+    );
+    return (
+      <AppShell
+        title="Detalle de cita"
+        showBack={true}
+        backHref="/today"
+        organizationName={org.name}
+        userName={viewer.profile?.displayName}
+        avatarUrl={viewer.profile?.avatarUrl}
+        unreadCount={unread}
+      >
+        <div className={styles.container}>
+          {result.kind === "not_found" && (
+            <EmptyState
+              icon={<CalendarPlusIcon size={26} color="var(--km-gray)" />}
+              title="Esta cita no existe"
+              description="Puede que se haya eliminado o que el enlace no sea correcto."
+              action={backAction}
+            />
+          )}
+          {result.kind === "forbidden" && (
+            <EmptyState
+              icon={<LockIcon size={26} color="var(--km-gray)" />}
+              title="No tienes acceso a esta cita"
+              description="Solo puedes ver las citas que tienes asignadas."
+              action={backAction}
+            />
+          )}
+          {result.kind === "error" && <ErrorState message={getHumanErrorMessage(result.error)} />}
+        </div>
+      </AppShell>
+    );
+  }
+
+  const appointment = result.appointment;
 
   // Sólo con `trust.view`; sin capacidad o sin RPC en el entorno -> null (sin indicador).
   const [unreadCount, deposit] = await Promise.all([

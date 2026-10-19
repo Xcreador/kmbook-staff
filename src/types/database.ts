@@ -579,6 +579,10 @@ export type Database = {
         Args: { p_organization_id: string; p_capability_key: string };
         Returns: boolean;
       };
+      get_studio_appointment_detail: {
+        Args: { p_organization_id: string; p_appointment_id: string };
+        Returns: unknown;
+      };
       get_professional_day: {
         Args: { p_organization_id: string; p_date: string };
         Returns: {
