@@ -18,7 +18,7 @@ const APPT = "11111111-1111-4111-8111-111111111111";
 const CASES: Array<[string, Parameters<typeof staffDestination>[0], string]> = [
   ["cita de Business → ficha de la cita en Staff", { url: `/app/studio/agenda?organization=o&appointment=${APPT}`, data: { eventType: "appointment.booked_online" } }, `/appointments/${APPT}`],
   ["cita sin id → agenda", { url: "/app/studio/agenda?organization=o", data: { eventType: "appointment.cancelled" } }, "/agenda"],
-  ["tarea → hoy", { url: "/app/studio/tasks?organization=o", data: { eventType: "task.assigned" } }, "/today"],
+  ["tarea → tareas", { url: "/app/studio/tasks?organization=o", data: { eventType: "task.assigned" } }, "/tasks"],
   ["prueba → pantalla de notificaciones", { url: "/app/notifications/push?organization=o", data: { eventType: "push.test" } }, "/profile/push"],
   ["evento desconocido → bandeja", { url: "/app/x", data: { eventType: "shop.order" } }, "/notifications"],
   ["URL externa nunca se usa", { url: "https://evil.example/?appointment=" + APPT, data: { eventType: "other" } }, "/notifications"],
@@ -60,11 +60,20 @@ describe("Staff Push — etiqueta y compatibilidad", () => {
 });
 
 describe("Staff Push — al pulsar nunca se abre un origen externo", () => {
-  it("el Service Worker comprueba el origen final (también «/\\\\host»)", () => {
-    expect(swSource).toContain("target.origin !== self.location.origin");
-    const origin = "https://staff.kmbook.es";
-    for (const evil of ["/\\evil.example", "//evil.example", "https://evil.example"]) {
-      expect(new URL(evil, origin).origin).not.toBe(origin);
+  // resolveNotificationTarget del Service Worker real, evaluada con un `self` simulado.
+  const start = swSource.indexOf("const DEEP_LINK_PREFIXES");
+  const end = swSource.indexOf('self.addEventListener("notificationclick"');
+  const resolve = new Function(
+    "self",
+    `${swSource.slice(start, end)}; return resolveNotificationTarget;`,
+  )({ location: { origin: "https://staff.kmbook.es" } }) as (raw: unknown) => string;
+
+  it("destinos externos o protocol-relative caen en /today", () => {
+    for (const evil of ["/\\evil.example", "//evil.example", "https://evil.example/today", "javascript:alert(1)"]) {
+      expect(resolve(evil)).toBe("/today");
     }
+  });
+  it("todos los destinos que genera staffDestination son rutas conocidas y se respetan", () => {
+    for (const [, payload, expected] of CASES) expect(resolve(staffDestination(payload))).toBe(expected);
   });
 });

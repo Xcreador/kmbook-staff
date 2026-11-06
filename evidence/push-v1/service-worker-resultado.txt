@@ -1,4 +1,4 @@
-# Entrega SIMULADA por CDP (ServiceWorker.deliverPushMessage) en Chromium local, con el payload exacto del worker de Core. NO es recepción real.
+# Entrega SIMULADA por CDP (ServiceWorker.deliverPushMessage) en Chromium local, con el payload exacto del worker de Core, sobre el sw.js integrado en main. NO es recepción real.
 [
  {
   "title": "Nueva reserva online",
@@ -13,6 +13,6 @@
  {
   "title": "Tarea asignada",
   "tag": "kmbook-task-assigned-2",
-  "url": "/today"
+  "url": "/tasks"
  }
 ]

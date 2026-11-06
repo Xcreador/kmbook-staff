@@ -9,7 +9,7 @@ bandeja → Push, worker `process-push-deliveries` y cron `kmbook-push-worker`.
 
 | Hallazgo | Riesgo | Corrección |
 |---|---|---|
-| Al pulsar abría `payload.data.url` sin validar | Las URL de Core son de Business (`/app/...`) y daban 404 en Staff; una URL absoluta se habría abierto tal cual | Traducción a rutas de Staff (`/appointments/{id}`, `/agenda`, `/today`, `/profile/push`, `/notifications`); sólo rutas propias |
+| Al pulsar abría `payload.data.url` sin validar | Las URL de Core son de Business (`/app/...`) y daban 404 en Staff; una URL absoluta se habría abierto tal cual | Traducción a rutas de Staff (`/appointments/{id}`, `/agenda`, `/tasks`, `/profile/push`, `/notifications`); sólo rutas propias |
 | Mostraba `event.data.text()` si el payload no era JSON | Texto arbitrario en pantalla bloqueada | Texto por defecto genérico |
 | Etiqueta sin validar | — | `[a-z0-9_-]{1,120}` (conserva la etiqueta por evento de Core: sin sustituciones entre avisos distintos) |
 | `subscribeToPush()` existía pero nadie la usaba y nunca enviaba la suscripción al servidor | Push no funcional | Pantalla Perfil → Notificaciones + Server Actions |
@@ -48,7 +48,7 @@ cada dispositivo suscrito: es intencionado y no son duplicados (una entrega por 
 
 - Vitest: 94 (22 nuevos: enrutado TS y SW con el archivo real, alta/baja, organización forzada, hash en cookie, baja al cerrar sesión, fallos de Core).
 - `tsc`, ESLint y `next build` correctos.
-- Chromium con entrega simulada por CDP y el payload exacto de Core: cita → `/appointments/{id}`, tarea → `/today`, prueba → `/profile/push` (`evidence/push-v1/`).
+- Chromium con entrega simulada por CDP y el payload exacto de Core: cita → `/appointments/{id}`, tarea → `/tasks`, prueba → `/profile/push` (`evidence/push-v1/`).
 - Recepción real: **pendiente** de una profesional y un dispositivo autorizados.
 
 ## Prueba real (procedimiento)
