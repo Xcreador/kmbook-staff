@@ -148,7 +148,9 @@ self.addEventListener("notificationclick", (event) => {
     event.notification.data.url.startsWith("/") && !event.notification.data.url.startsWith("//")
     ? event.notification.data.url
     : STAFF_FALLBACK_URL;
-  const target = new URL(path, self.location.origin);
+  let target = new URL(path, self.location.origin);
+  // «/\\host» empieza por «/» pero el navegador lo normaliza a otro origen: se comprueba el origen final.
+  if (target.origin !== self.location.origin) target = new URL(STAFF_FALLBACK_URL, self.location.origin);
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {

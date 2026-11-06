@@ -58,3 +58,13 @@ describe("Staff Push — etiqueta y compatibilidad", () => {
     expect(describeDevice("Mozilla/5.0 (Linux; Android 14) Chrome/130.0 Mobile")).toBe("Staff · Chrome en Android");
   });
 });
+
+describe("Staff Push — al pulsar nunca se abre un origen externo", () => {
+  it("el Service Worker comprueba el origen final (también «/\\\\host»)", () => {
+    expect(swSource).toContain("target.origin !== self.location.origin");
+    const origin = "https://staff.kmbook.es";
+    for (const evil of ["/\\evil.example", "//evil.example", "https://evil.example"]) {
+      expect(new URL(evil, origin).origin).not.toBe(origin);
+    }
+  });
+});

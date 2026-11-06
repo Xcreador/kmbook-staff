@@ -124,11 +124,27 @@ export function StaffPushSettings({
     setMessage(null);
     startTransition(async () => {
       const subscription = await getCurrentPushSubscription();
-      if (subscription) {
-        await unsubscribeStaffPushAction(subscription.endpoint);
-        await subscription.unsubscribe().catch(() => false);
+      if (!subscription) {
+        setMessage({ text: "Este navegador no tiene ninguna suscripción activa.", error: false });
+        await refresh();
+        return;
       }
-      setMessage({ text: "Este dispositivo ya no recibirá notificaciones.", error: false });
+      // 1) Baja en el servidor (requiere la sesión). 2) Baja en el navegador, SIEMPRE:
+      // aunque el servidor falle, el endpoint deja de existir y Core lo poda al primer envío.
+      const server = await unsubscribeStaffPushAction(subscription.endpoint);
+      const browser = await subscription.unsubscribe().catch(() => false);
+      if (server.ok && browser) {
+        setMessage({ text: "Este dispositivo ya no recibirá notificaciones.", error: false });
+      } else if (!server.ok && browser) {
+        setMessage({
+          text: "Se ha desactivado en este navegador, pero no se pudo confirmar la baja en el servidor. No recibirás avisos aquí; el registro se limpiará automáticamente. Si persiste, desactívalo desde la lista de dispositivos.",
+          error: true,
+        });
+      } else if (server.ok && !browser) {
+        setMessage({ text: "Baja registrada en el servidor, pero el navegador no confirmó la anulación. Revisa los permisos de notificaciones del sistema.", error: true });
+      } else {
+        setMessage({ text: "No se pudo desactivar. Comprueba tu conexión e inténtalo de nuevo.", error: true });
+      }
       await refresh();
     });
   }
