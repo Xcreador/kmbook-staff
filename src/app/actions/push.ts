@@ -61,7 +61,7 @@ export async function subscribeStaffPushAction(input: z.input<typeof subscribeSc
     p_user_agent: parsed.data.userAgent ?? null,
   });
   if (error) return { ok: false, message: await publicError(error.message) };
-  await rememberPushDevice(createHash("sha256").update(parsed.data.endpoint.trim()).digest("hex"));
+  await rememberPushDevice(organizationId, createHash("sha256").update(parsed.data.endpoint.trim()).digest("hex"));
   return { ok: true };
 }
 
@@ -70,10 +70,11 @@ export async function unsubscribeStaffPushAction(endpoint: string): Promise<Staf
   const parsed = endpointSchema.safeParse(endpoint);
   if (!parsed.success) return { ok: false, message: "Suscripción no válida." };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("unregister_push_subscription", { p_endpoint: parsed.data });
-  if (error) return { ok: false, message: await publicError(error.message) };
+  const { data, error } = await supabase.rpc("unregister_push_subscription", { p_endpoint: parsed.data });
+  if (error) return { ok: false, message: "No se pudo confirmar la baja en el servidor." };
   await forgetPushDevice();
-  return { ok: true };
+  // `false` = no había suscripción activa de esta cuenta para ese endpoint (ya estaba de baja).
+  return { ok: true, message: data === false ? "Este dispositivo ya no estaba suscrito." : undefined };
 }
 
 export async function revokeStaffPushDeviceAction(subscriptionId: string): Promise<StaffPushResult> {

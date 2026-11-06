@@ -62,6 +62,43 @@ cada dispositivo suscrito: es intencionado y no son duplicados (una entrega por 
 6. «Desactivar en este dispositivo» → nueva prueba: no llega. Cerrar sesión → no llega.
 7. Verificación en la base (sólo lectura): entregas `sent` y `last_success_at` del dispositivo «Staff · …».
 
+## Auditoría de cierre (PR #12)
+
+### Caminos que cambian la organización activa o cierran la sesión
+
+| Camino | Antes | Ahora |
+|---|---|---|
+| Perfil → «Cambiar negocio» (`clearActiveOrganization`) | Baja en Core | Baja en el navegador + baja en Core |
+| `/select-organization` → elegir otro negocio (`setActiveOrganization`, cambio **directo** A → B) | **Sin baja**: el dispositivo seguía en A | La cookie guarda `organización:hash`; cualquier cambio a otra organización da de baja el dispositivo **antes** de activar la nueva, más baja en el navegador |
+| Mismo negocio (A → A) | — | No toca la suscripción |
+| Autoselección con una sola organización | — | Sin cambio de organización: nada que dar de baja |
+| Cerrar sesión (Perfil y `/select-organization`) | Baja en Core; un fallo se perdía en silencio | Baja en el navegador + baja en Core |
+| Membresía desactivada por el centro | — | Core revoca los dispositivos y revalida la membresía en cada envío |
+
+### Fallos parciales
+
+- **Dos capas independientes.** El navegador anula la suscripción en el servicio Push
+  (`releaseBrowserPush`, máximo 3 s) **antes** de la acción del servidor. Aunque Core no
+  responda, el endpoint deja de existir: el siguiente envío obtiene 404/410 y Core poda la fila.
+- **Core falla y el navegador funciona:** el dispositivo ya no recibe nada. La fila queda
+  activa hasta el primer envío, que la poda. La cookie se conserva.
+- **El navegador falla y Core funciona:** la baja en Core basta, porque el worker no envía
+  a filas inactivas.
+- **Los dos fallan** (sin red en ambos): es la única ventana en la que la suscripción
+  antigua sigue viva. Al cambiar de negocio, el cambio continúa (Push nunca bloquea);
+  la limpieza ocurre al siguiente registro de ese navegador (transferencia de
+  propiedad del endpoint) o desde Business → Dispositivos. El texto de las notificaciones es
+  genérico, así que no expone datos de clientas.
+- **«Desactivar en este dispositivo»:** sólo declara éxito si **servidor y navegador**
+  confirman. En cualquier otro caso dice exactamente qué falló.
+
+### Otras comprobaciones
+
+- Al pulsar se comprueba el origen final en el Service Worker, también para `/\host`.
+- Revocar un dispositivo exige un UUID válido; Core sólo revoca filas propias.
+- Entradas de alta validadas con zod antes de llegar a Core.
+- La organización forzada desde el navegador se ignora.
+
 ## Rollback
 
 Revertir la PR. Las suscripciones de Staff que queden caducan solas

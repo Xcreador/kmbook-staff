@@ -1,5 +1,5 @@
 import "server-only";
-import { releasePushDevice } from "@/lib/kmbook/push-device";
+import { releasePushDevice, releasePushDeviceIfOrganizationChanges } from "@/lib/kmbook/push-device";
 
 import { cache } from "react";
 import { cookies } from "next/headers";
@@ -208,6 +208,10 @@ export async function setActiveOrganization(orgId: string): Promise<void> {
   if (!membership) {
     throw new Error("No tienes acceso a esta organización.");
   }
+
+  // Cambio directo A → B (sin pasar por clearActiveOrganization): el dispositivo
+  // suscrito a A se da de baja antes de activar B.
+  await releasePushDeviceIfOrganizationChanges(orgId);
 
   const cookieStore = await cookies();
   cookieStore.set(ACTIVE_ORG_COOKIE, orgId, {

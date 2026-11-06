@@ -4,6 +4,7 @@ import { BrandMark } from "@/components/BrandMark";
 import { BuildingIcon, ArrowRightIcon, LogOutIcon } from "@/components/Icons";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/Button";
+import { PushSafeForm } from "@/components/PushSafeForm";
 import styles from "./select-organization.module.css";
 
 export default async function SelectOrganizationPage() {
@@ -50,11 +51,11 @@ export default async function SelectOrganizationPage() {
             title="Sin organizaciones activas"
             description="Tu usuario todavía no tiene una membresía asignada en ningún salón o negocio KMBOOK."
             action={
-              <form action={handleLogout}>
+              <PushSafeForm action={handleLogout}>
                 <Button variant="secondary" size="sm" type="submit" icon={<LogOutIcon size={16} />}>
                   Cerrar sesión
                 </Button>
-              </form>
+              </PushSafeForm>
             }
           />
         ) : (
@@ -63,7 +64,7 @@ export default async function SelectOrganizationPage() {
               const isSelected = context.activeOrganization?.id === org.id;
 
               return (
-                <form key={org.id} action={handleSelectOrg} className={styles.orgForm}>
+                <PushSafeForm key={org.id} action={handleSelectOrg} releasePush={Boolean(context.activeOrganization) && context.activeOrganization?.id !== org.id} className={styles.orgForm}>
                   <input type="hidden" name="orgId" value={org.id} />
                   <button
                     type="submit"
@@ -82,19 +83,19 @@ export default async function SelectOrganizationPage() {
                     </div>
                     <ArrowRightIcon size={18} color="var(--km-pink)" />
                   </button>
-                </form>
+                </PushSafeForm>
               );
             })}
           </div>
         )}
 
         <div className={styles.footer}>
-          <form action={handleLogout}>
+          <PushSafeForm action={handleLogout}>
             <button type="submit" className={styles.logoutBtn}>
               <LogOutIcon size={16} color="var(--km-gray)" />
               <span>Cerrar sesión</span>
             </button>
-          </form>
+          </PushSafeForm>
         </div>
       </div>
     </div>

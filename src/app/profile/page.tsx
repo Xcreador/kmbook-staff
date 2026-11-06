@@ -14,6 +14,7 @@ import { ProfilePushLink } from "@/components/ProfilePushLink";
 import { Avatar } from "@/components/Avatar";
 import { BusinessAccessCard } from "@/components/BusinessAccessCard";
 import { getStudioAccess, NO_STUDIO_ACCESS } from "@/lib/kmbook/studio-access";
+import { PushSafeForm } from "@/components/PushSafeForm";
 import styles from "./profile.module.css";
 
 export default async function ProfilePage() {
@@ -102,12 +103,12 @@ export default async function ProfilePage() {
             </div>
 
             {viewer.organizations.length > 1 && (
-              <form action={handleSwitchOrg}>
+              <PushSafeForm action={handleSwitchOrg}>
                 <button type="submit" className={styles.switchOrgBtn}>
                   <RefreshCwIcon size={14} color="var(--km-pink)" />
                   <span>Cambiar negocio</span>
                 </button>
-              </form>
+              </PushSafeForm>
             )}
           </div>
         </section>
@@ -137,7 +138,7 @@ export default async function ProfilePage() {
 
         {/* Botón de Cerrar Sesión */}
         <div className={styles.logoutWrapper}>
-          <form action={handleLogout}>
+          <PushSafeForm action={handleLogout}>
             <Button
               type="submit"
               variant="danger"
@@ -147,7 +148,7 @@ export default async function ProfilePage() {
             >
               Cerrar sesión
             </Button>
-          </form>
+          </PushSafeForm>
         </div>
       </div>
     </AppShell>
