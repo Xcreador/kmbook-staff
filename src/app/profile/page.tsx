@@ -10,6 +10,7 @@ import {
   MapPinIcon,
 } from "@/components/Icons";
 import { Button } from "@/components/Button";
+import { ProfilePushLink } from "@/components/ProfilePushLink";
 import { Avatar } from "@/components/Avatar";
 import { BusinessAccessCard } from "@/components/BusinessAccessCard";
 import { getStudioAccess, NO_STUDIO_ACCESS } from "@/lib/kmbook/studio-access";
@@ -109,6 +110,14 @@ export default async function ProfilePage() {
               </form>
             )}
           </div>
+        </section>
+
+        {/* Notificaciones Push en este dispositivo */}
+        <section className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>NOTIFICACIONES</h3>
+          </div>
+          <ProfilePushLink />
         </section>
 
         {/* Accesos a Business: solo con permiso expreso de Core, nunca por rol. */}
