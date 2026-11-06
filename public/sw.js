@@ -92,54 +92,71 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// Push notification handling
-self.addEventListener("push", (event) => {
-  if (!event.data) return;
+// ---------------------------------------------------------------------------
+// Push V1. El worker de Core envía la misma Push a todos los dispositivos de la
+// usuaria; su `url` apunta a rutas de Business (`/app/...`). Aquí se traduce a
+// la pantalla de Staff. Copia literal de src/lib/kmbook/push-routing.ts
+// (staffDestination / safeTag): cualquier cambio, en los dos sitios.
+// ---------------------------------------------------------------------------
+const STAFF_FALLBACK_URL = "/notifications";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
+function staffDestination(payload) {
+  const data = payload && typeof payload.data === "object" && payload.data ? payload.data : {};
+  const eventType = typeof data.eventType === "string" ? data.eventType : "";
+  const rawUrl = typeof payload?.url === "string" ? payload.url : typeof data.url === "string" ? data.url : "";
+  if (eventType === "push.test") return "/profile/push";
+  if (eventType.startsWith("task.")) return "/today";
+  if (eventType.startsWith("appointment.")) {
+    const match = /[?&]appointment=([0-9a-f-]{36})(?:&|$)/.exec(rawUrl);
+    if (match && UUID_RE.test(match[1])) return "/appointments/" + match[1];
+    return "/agenda";
+  }
+  return STAFF_FALLBACK_URL;
+}
+
+function safeTag(tag) {
+  return typeof tag === "string" && /^[a-z0-9_-]{1,120}$/.test(tag) ? tag : "kmbook-staff-notification";
+}
+
+self.addEventListener("push", (event) => {
+  let payload = {};
   try {
-    const payload = event.data.json();
-    const title = payload.title || "KMBOOK Staff";
-    const options = {
-      body: payload.body || "Tienes una nueva actualización en tu agenda.",
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = {};
+  }
+  // Texto genérico desde Core (sin datos de clientas). Nunca se muestra texto plano arbitrario.
+  const title = typeof payload.title === "string" && payload.title ? payload.title.slice(0, 120) : "KMBOOK Staff";
+  const body = typeof payload.body === "string" && payload.body ? payload.body.slice(0, 240) : "Tienes un aviso nuevo.";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
       icon: "/icon-192.png",
       badge: "/icon-192.png",
-      vibrate: [100, 50, 100],
-      data: payload.data || { url: "/today" },
-      tag: payload.tag || "kmbook-staff-notification",
-      renotify: true,
-    };
-
-    event.waitUntil(self.registration.showNotification(title, options));
-  } catch {
-    const text = event.data.text();
-    event.waitUntil(
-      self.registration.showNotification("KMBOOK Staff", {
-        body: text,
-        icon: "/icon-192.png",
-      }),
-    );
-  }
+      tag: safeTag(payload.tag),
+      data: { url: staffDestination(payload) },
+    }),
+  );
 });
 
-// Notification click deep-linking
-// Regla 28: app cerrada -> llega push -> tap -> abre destino correcto (ej. /appointments/{id})
+// Al pulsar: sólo rutas propias de Staff; la app vuelve a comprobar sesión,
+// negocio activo y permisos (una cita ajena da «sin acceso»).
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const targetUrl = event.notification.data?.url || "/today";
-
+  const path = event.notification.data && typeof event.notification.data.url === "string" &&
+    event.notification.data.url.startsWith("/") && !event.notification.data.url.startsWith("//")
+    ? event.notification.data.url
+    : STAFF_FALLBACK_URL;
+  const target = new URL(path, self.location.origin);
   event.waitUntil(
-    self.clients
-      .matchAll({ type: "window", includeUncontrolled: true })
-      .then((clientList) => {
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && "focus" in client) {
-            client.navigate(targetUrl);
-            return client.focus();
-          }
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (new URL(client.url).origin === target.origin && "focus" in client) {
+          return client.focus().then((focused) => (focused && "navigate" in focused ? focused.navigate(target.href) : undefined));
         }
-        if (self.clients.openWindow) {
-          return self.clients.openWindow(targetUrl);
-        }
-      }),
+      }
+      return self.clients.openWindow ? self.clients.openWindow(target.href) : undefined;
+    }),
   );
 });

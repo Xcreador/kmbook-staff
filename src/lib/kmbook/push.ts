@@ -86,3 +86,17 @@ export async function getPushSubscriptionState(): Promise<{
     return { isSupported: true, permission, isSubscribed: false };
   }
 }
+
+/**
+ * Suscripción actual SIN esperar a `serviceWorker.ready` (que no se resuelve si
+ * no hay SW registrado y dejaría la pantalla colgada).
+ */
+export async function getCurrentPushSubscription(): Promise<PushSubscription | null> {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) return null;
+  try {
+    const registration = await navigator.serviceWorker.getRegistration("/");
+    return registration ? await registration.pushManager.getSubscription() : null;
+  } catch {
+    return null;
+  }
+}

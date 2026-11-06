@@ -1,4 +1,5 @@
 import "server-only";
+import { releasePushDevice } from "@/lib/kmbook/push-device";
 
 import { cache } from "react";
 import { cookies } from "next/headers";
@@ -201,6 +202,8 @@ export async function setActiveOrganization(orgId: string): Promise<void> {
  * Regla 11: Limpieza inmediata de contexto previo.
  */
 export async function clearActiveOrganization(): Promise<void> {
+  // El dispositivo estaba suscrito a la organización saliente: se da de baja.
+  await releasePushDevice();
   const cookieStore = await cookies();
   cookieStore.delete(ACTIVE_ORG_COOKIE);
 }
@@ -209,6 +212,8 @@ export async function clearActiveOrganization(): Promise<void> {
  * Cierre de sesión seguro eliminando cookies y sesión de Supabase.
  */
 export async function logout(): Promise<void> {
+  // Antes de cerrar la sesión: este dispositivo deja de recibir los avisos de esta cuenta.
+  await releasePushDevice();
   try {
     const supabase = await createClient();
     await supabase.auth.signOut();
