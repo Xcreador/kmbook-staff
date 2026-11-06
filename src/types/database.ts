@@ -704,6 +704,20 @@ export type Database = {
         Args: { p_organization_id: string };
         Returns: number;
       };
+      register_push_subscription: {
+        Args: { p_organization_id: string; p_endpoint: string; p_p256dh: string; p_auth: string; p_device_label?: string | null; p_user_agent?: string | null };
+        Returns: string;
+      };
+      unregister_push_subscription: { Args: { p_endpoint: string }; Returns: boolean };
+      unregister_push_subscription_by_hash: { Args: { p_endpoint_hash: string }; Returns: boolean };
+      revoke_my_push_subscription: { Args: { p_subscription_id: string }; Returns: boolean };
+      list_my_push_subscriptions: {
+        Args: { p_organization_id: string; p_current_endpoint?: string | null };
+        Returns: { id: string; device_label: string | null; user_agent: string | null; created_at: string; last_seen_at: string; last_success_at: string | null; is_current: boolean }[];
+      };
+      get_my_push_preferences: { Args: { p_organization_id: string }; Returns: { event_type: string; title: string; push: boolean }[] };
+      set_my_push_preference: { Args: { p_organization_id: string; p_event_type: string; p_enabled: boolean }; Returns: undefined };
+      request_push_test: { Args: { p_organization_id: string }; Returns: number };
       studio_attendance_clock: {
         Args: {
           p_organization_id: string;

@@ -12,8 +12,10 @@ import {
   RefreshCwIcon,
   MapPinIcon,
   ExternalLinkIcon,
+  BellIcon,
 } from "@/components/Icons";
 import { Button } from "@/components/Button";
+import { PushSafeForm } from "@/components/PushSafeForm";
 import styles from "./profile.module.css";
 
 export default async function ProfilePage() {
@@ -105,14 +107,31 @@ export default async function ProfilePage() {
             </div>
 
             {viewer.organizations.length > 1 && (
-              <form action={handleSwitchOrg}>
+              <PushSafeForm action={handleSwitchOrg}>
                 <button type="submit" className={styles.switchOrgBtn}>
                   <RefreshCwIcon size={14} color="var(--km-pink)" />
                   <span>Cambiar negocio</span>
                 </button>
-              </form>
+              </PushSafeForm>
             )}
           </div>
+        </section>
+
+        {/* Notificaciones Push en este dispositivo */}
+        <section className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>NOTIFICACIONES</h3>
+          </div>
+          <Link href="/profile/push" className={styles.actionRow}>
+            <div className={styles.actionLeft}>
+              <BellIcon size={20} color="var(--km-oxford)" />
+              <div className={styles.actionTexts}>
+                <span className={styles.actionTitle}>Notificaciones en este dispositivo</span>
+                <span className={styles.actionDesc}>Citas asignadas, cambios y tareas</span>
+              </div>
+            </div>
+            <span className={styles.actionArrow}>→</span>
+          </Link>
         </section>
 
         {/* Acceso rápido a Mi Horario */}
@@ -171,7 +190,7 @@ export default async function ProfilePage() {
 
         {/* Botón de Cerrar Sesión */}
         <div className={styles.logoutWrapper}>
-          <form action={handleLogout}>
+          <PushSafeForm action={handleLogout}>
             <Button
               type="submit"
               variant="danger"
@@ -181,7 +200,7 @@ export default async function ProfilePage() {
             >
               Cerrar sesión
             </Button>
-          </form>
+          </PushSafeForm>
         </div>
       </div>
     </AppShell>

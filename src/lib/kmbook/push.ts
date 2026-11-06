@@ -86,3 +86,38 @@ export async function getPushSubscriptionState(): Promise<{
     return { isSupported: true, permission, isSubscribed: false };
   }
 }
+
+/**
+ * Suscripción actual SIN esperar a `serviceWorker.ready` (que no se resuelve si
+ * no hay SW registrado y dejaría la pantalla colgada).
+ */
+export async function getCurrentPushSubscription(): Promise<PushSubscription | null> {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) return null;
+  try {
+    const registration = await navigator.serviceWorker.getRegistration("/");
+    return registration ? await registration.pushManager.getSubscription() : null;
+  } catch {
+    return null;
+  }
+}
+
+export type BrowserReleaseResult = "released" | "none" | "failed";
+
+/**
+ * Anula la suscripción en el propio navegador (servicio Push). Es la garantía
+ * independiente de Core: aunque la baja en el servidor falle, el endpoint deja
+ * de existir y los envíos posteriores responden 404/410 (Core poda la fila).
+ * Acotada en tiempo: nunca bloquea el cierre de sesión ni el cambio de negocio.
+ */
+export async function releaseBrowserPush(
+  getSubscription: () => Promise<PushSubscription | null> = getCurrentPushSubscription,
+  timeoutMs = 3000,
+): Promise<BrowserReleaseResult> {
+  const work = (async (): Promise<BrowserReleaseResult> => {
+    const subscription = await getSubscription();
+    if (!subscription) return "none";
+    return (await subscription.unsubscribe()) ? "released" : "failed";
+  })().catch((): BrowserReleaseResult => "failed");
+  const timeout = new Promise<BrowserReleaseResult>((resolve) => setTimeout(() => resolve("failed"), timeoutMs));
+  return Promise.race([work, timeout]);
+}
